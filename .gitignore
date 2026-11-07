@@ -1,0 +1,26 @@
+# Backend
+BE_KIEM_THU/vendor/
+BE_KIEM_THU/.env
+BE_KIEM_THU/.env.backup
+BE_KIEM_THU/.env.production
+BE_KIEM_THU/storage/*.key
+BE_KIEM_THU/storage/logs/
+BE_KIEM_THU/storage/framework/cache/
+BE_KIEM_THU/storage/framework/sessions/
+BE_KIEM_THU/storage/framework/views/
+BE_KIEM_THU/public/storage
+BE_KIEM_THU/public/build
+BE_KIEM_THU/public/hot
+
+# Frontend
+FE_KIEM_THU/node_modules/
+FE_KIEM_THU/dist/
+FE_KIEM_THU/dist-ssr/
+FE_KIEM_THU/*.local
+
+# Global
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
