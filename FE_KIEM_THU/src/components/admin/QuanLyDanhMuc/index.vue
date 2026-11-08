@@ -16,14 +16,26 @@
     <div class="filter-card">
       <div class="search-box">
         <label for="tim-kiem-dm"><i class="bi bi-search"></i> Tìm kiếm danh mục:</label>
-        <input
-          id="tim-kiem-dm"
-          type="text"
-          v-model="tim_kiem"
-          placeholder="Nhập tên danh mục hoặc slug (ví dụ: ao-nam)..."
-          class="form-control"
-          data-testid="input-tim-kiem-danh-muc"
-        />
+        <div class="search-input-wrapper">
+          <input
+            id="tim-kiem-dm"
+            type="text"
+            v-model="tim_kiem"
+            placeholder="Nhập tên danh mục hoặc slug (ví dụ: ao-nam)..."
+            class="form-control"
+            data-testid="input-tim-kiem-danh-muc"
+          />
+          <button
+            v-if="tim_kiem"
+            type="button"
+            class="btn-clear-search"
+            data-testid="btn-xoa-tim-kiem"
+            @click="tim_kiem = ''"
+            title="Xóa nhanh từ khóa tìm kiếm"
+          >
+            &times;
+          </button>
+        </div>
       </div>
     </div>
 
@@ -279,6 +291,7 @@ export default {
         }
         return;
       }
+      this.create_DM.ten_danh_muc = this.create_DM.ten_danh_muc.trim();
 
       axios
         .post('http://127.0.0.1:8000/api/admin/danh-muc/create', this.create_DM)
@@ -338,6 +351,7 @@ export default {
         }
         return;
       }
+      this.edit_DM.ten_danh_muc = this.edit_DM.ten_danh_muc.trim();
 
       axios
         .post('http://127.0.0.1:8000/api/admin/danh-muc/update', this.edit_DM)
@@ -479,6 +493,22 @@ export default {
   margin-bottom: 20px;
 }
 .search-box label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
+.search-input-wrapper { position: relative; display: flex; align-items: center; }
+.search-input-wrapper .form-control { padding-right: 36px; }
+.btn-clear-search {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+.btn-clear-search:hover { color: #1e293b; background: #e2e8f0; }
 .form-control {
   width: 100%;
   padding: 9px 14px;
