@@ -77,6 +77,9 @@
         <div class="account-pill clickable-pill" @click="chonTaiKhoan('admin@shop.com', 'password123')" title="Click để điền tài khoản này">
           <span><i class="bi bi-shield-check text-primary"></i> Admin Flagship:</span> <code>admin@shop.com</code>
         </div>
+        <div class="account-pill clickable-pill" @click="chonTaiKhoan('nguyenvanky20005@gmail.com', 'password123')" title="Tài khoản cá nhân Nguyễn Văn Kỳ">
+          <span><i class="bi bi-person-badge-fill text-warning"></i> Nguyễn Văn Kỳ:</span> <code>nguyenvanky20005@gmail.com</code>
+        </div>
         <div class="account-pill clickable-pill" @click="chonTaiKhoan('customer@shop.com', 'password123')" title="Click để điền tài khoản này">
           <span><i class="bi bi-person-heart text-success"></i> Khách hàng VIP:</span> <code>customer@shop.com</code>
         </div>

@@ -17,6 +17,8 @@ Route::post('/dang-ky', [AuthController::class, 'dangKy']);
 Route::post('/register', [AuthController::class, 'dangKy']);
 Route::post('/quen-mat-khau', [AuthController::class, 'quenMatKhau']);
 Route::post('/forgot-password', [AuthController::class, 'quenMatKhau']);
+Route::post('/dat-lai-mat-khau', [AuthController::class, 'datLaiMatKhau']);
+Route::post('/reset-password', [AuthController::class, 'datLaiMatKhau']);
 
 Route::group(['prefix' => 'admin'], function () {
 

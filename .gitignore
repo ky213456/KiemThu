@@ -27,3 +27,6 @@ Thumbs.db
  
 # Backup files
 *_ORIGINAL.xlsx
+ 
+# Excel temporary lock files
+~$*.xlsx

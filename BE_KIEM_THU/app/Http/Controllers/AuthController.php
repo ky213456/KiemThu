@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\SendOtpMail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class AuthController extends BaseController
 {
@@ -153,7 +158,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Chức năng: Quên mật khẩu
+     * Chức năng: Quên mật khẩu - Tạo mã OTP và gửi về email
      */
     public function quenMatKhau(Request $request)
     {
@@ -161,7 +166,7 @@ class AuthController extends BaseController
             'email' => 'required|email',
         ], [
             'email.required' => 'Vui lòng nhập email tài khoản cần khôi phục!',
-            'email.email'    => 'Địa chỉ email không đúng định dạng!',
+            'email.email'    => 'Địa chỉ email không đúng định dạng (ví dụ: user@gmail.com)!',
         ]);
 
         if ($validator->fails()) {
@@ -179,9 +184,110 @@ class AuthController extends BaseController
             ], 404);
         }
 
+        if (!$user->trang_thai) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tài khoản của bạn đã bị KHÓA, không thể khôi phục mật khẩu!',
+            ], 403);
+        }
+
+        // Tạo mã OTP 6 số ngẫu nhiên
+        $otp = (string) rand(100000, 999999);
+
+        // Lưu vào bảng password_reset_tokens
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            ['token' => $otp, 'created_at' => now()]
+        );
+
+        // Đẩy email vào Queue xử lý qua Laravel Queue Worker (php artisan queue:work)
+        try {
+            Mail::to($request->email)->queue(new SendOtpMail($user->ho_ten, $request->email, $otp));
+        } catch (\Exception $e) {
+            Log::warning("Đẩy job queue gửi mail OTP thất bại: " . $e->getMessage());
+        }
+
         return response()->json([
             'status'  => true,
-            'message' => 'Mã OTP khôi phục mật khẩu đã được gửi đến hộp thư ' . $request->email . ' (Mã mẫu test: 123456)',
+            'message' => 'Mã OTP xác thực (6 số) đã được gửi đến hộp thư ' . $request->email . '!',
+            'email'   => $request->email,
+        ]);
+    }
+
+    /**
+     * Chức năng: Đặt lại mật khẩu với mã OTP
+     */
+    public function datLaiMatKhau(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email'                 => 'required|email',
+            'otp'                   => 'required|digits:6',
+            'password'              => 'required|min:6',
+            'password_confirmation' => 'required|same:password',
+        ], [
+            'email.required'                 => 'Vui lòng cung cấp email tài khoản!',
+            'email.email'                    => 'Email không đúng định dạng!',
+            'otp.required'                   => 'Vui lòng nhập mã OTP 6 chữ số!',
+            'otp.digits'                     => 'Mã OTP phải gồm đúng 6 chữ số!',
+            'password.required'              => 'Vui lòng nhập mật khẩu mới!',
+            'password.min'                   => 'Mật khẩu mới phải có ít nhất 6 ký tự!',
+            'password_confirmation.required' => 'Vui lòng xác nhận lại mật khẩu mới!',
+            'password_confirmation.same'     => 'Mật khẩu xác nhận không trùng khớp với mật khẩu mới!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$record) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Không tìm thấy yêu cầu khôi phục mật khẩu cho email này hoặc mã đã hết hạn!',
+            ], 422);
+        }
+
+        // Kiểm tra mã OTP khớp không
+        if ($record->token !== trim($request->otp)) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Mã OTP xác thực không chính xác! Vui lòng kiểm tra lại.',
+            ], 422);
+        }
+
+        // Kiểm tra thời hạn 15 phút
+        if ($record->created_at && Carbon::parse($record->created_at)->addMinutes(15)->isPast()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Mã OTP đã hết hạn hiệu lực (quá 15 phút). Vui lòng gửi lại yêu cầu mới!',
+            ], 422);
+        }
+
+        // Cập nhật mật khẩu mới cho user
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tài khoản không tồn tại trên hệ thống!',
+            ], 404);
+        }
+
+        $user->mat_khau = Hash::make($request->password);
+        $user->save();
+
+        // Xóa mã OTP sau khi sử dụng thành công
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Chúc mừng! Bạn đã đổi mật khẩu mới thành công. Vui lòng đăng nhập với mật khẩu mới.',
         ]);
     }
 }
