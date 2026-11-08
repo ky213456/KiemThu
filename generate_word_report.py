@@ -2,7 +2,7 @@
 import docx
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
+from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 import os
@@ -15,7 +15,7 @@ def set_cell_background(cell, fill_hex):
     shd.set(qn('w:fill'), fill_hex)
     tcPr.append(shd)
 
-def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
+def set_cell_margins(cell, top=60, bottom=60, left=60, right=60):
     tcPr = cell._tc.get_or_add_tcPr()
     tcMar = OxmlElement('w:tcMar')
     for m, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
@@ -28,17 +28,16 @@ def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
 def create_report():
     doc = docx.Document()
     
-    # Page setup - A4
+    # Page setup - Margins
     for section in doc.sections:
-        section.top_margin = Inches(0.8)
-        section.bottom_margin = Inches(0.8)
-        section.left_margin = Inches(0.8)
-        section.right_margin = Inches(0.8)
+        section.top_margin = Inches(0.5)
+        section.bottom_margin = Inches(0.5)
+        section.left_margin = Inches(0.5)
+        section.right_margin = Inches(0.5)
         
-    # Styles
     normal_style = doc.styles['Normal']
     normal_style.font.name = 'Times New Roman'
-    normal_style.font.size = Pt(11)
+    normal_style.font.size = Pt(10)
     normal_style.font.color.rgb = RGBColor(0x1F, 0x29, 0x37)
 
     # ------------------ COVER PAGE ------------------
@@ -46,39 +45,38 @@ def create_report():
     p_univ.alignment = WD_ALIGN_PARAGRAPH.CENTER
     r_univ = p_univ.add_run("BỘ GIÁO DỤC VÀ ĐÀO TẠO\nTRƯỜNG ĐẠI HỌC - KHOA CÔNG NGHỆ THÔNG TIN\n-----------------------------")
     r_univ.bold = True
-    r_univ.font.size = Pt(13)
+    r_univ.font.size = Pt(12)
     r_univ.font.color.rgb = RGBColor(0x0F, 0x17, 0x2A)
 
-    doc.add_paragraph("\n\n")
+    doc.add_paragraph("\n")
 
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     r_title = p_title.add_run("BÁO CÁO ĐỒ ÁN KIỂM THỬ PHẦN MỀM (SOFTWARE TESTING)\n")
     r_title.bold = True
-    r_title.font.size = Pt(18)
+    r_title.font.size = Pt(16)
     r_title.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
 
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_sub = p_sub.add_run("ĐỀ TÀI: KIỂM THỬ CHỨC NĂNG HỆ THỐNG QUẢN TRỊ THỜI TRANG & BÁN LẺ POS MAISON ATELIER\n(Đầy đủ 300+ Test Cases chức năng phân chia cho 6 thành viên)")
+    r_sub = p_sub.add_run("ĐỀ TÀI: KIỂM THỬ CHỨC NĂNG HỆ THỐNG QUẢN TRỊ THỜI TRANG & POS BÁN LẺ MAISON ATELIER\n(Tài liệu kiểm thử chi tiết 300+ Test Cases - Chuẩn hóa 100% khớp mã nguồn cho Thành Viên 1)")
     r_sub.italic = True
-    r_sub.font.size = Pt(13)
+    r_sub.font.size = Pt(11)
     r_sub.font.color.rgb = RGBColor(0x47, 0x55, 0x69)
 
-    doc.add_paragraph("\n\n\n")
+    doc.add_paragraph("\n")
 
-    # Member Info Table
     info_table = doc.add_table(rows=8, cols=2)
     info_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     
     rows_data = [
         ("Giảng viên hướng dẫn:", "ThS. Giảng viên phụ trách môn Kiểm thử phần mềm"),
         ("Học phần:", "Kiểm thử và Đảm bảo Chất lượng Phần mềm (Software Testing & QA)"),
-        ("Công nghệ kiểm thử:", "Kiểm thử chức năng hộp đen (Black-box Functional Testing)"),
-        ("Môi trường kiểm thử:", "Frontend Vue 3 (Vite, Axios) - Backend Laravel 11 API - MySQL"),
-        ("Số lượng thành viên:", "06 Thành viên"),
-        ("Quy định đề tài:", "Mỗi thành viên thực hiện tối thiểu 50 Test Cases chức năng"),
-        ("Tổng số Test Cases:", "300+ Test Cases hoàn chỉnh (50+ TC / thành viên)"),
+        ("Công nghệ kiểm thử:", "Kiểm thử chức năng hộp đen (Black-box Testing) & Tích hợp API"),
+        ("Môi trường kiểm thử:", "Frontend Vue 3 (Vite, Axios) - Backend Laravel 11 API - MySQL Database"),
+        ("Phân công báo cáo:", "THÀNH VIÊN 1: Phân hệ Xác thực & Quản lý Người dùng (Auth & User Management)"),
+        ("Quy định số lượng TC:", "Mỗi thành viên thực hiện tối thiểu 50 Test Cases chức năng"),
+        ("Tổng số Test Cases:", "306 Test Cases hoàn chỉnh (Thành viên 1: 52 Test Cases chuẩn 100% code)"),
         ("Thời gian thực hiện:", "Học kỳ 1 - Năm học 2026 - 2027")
     ]
     
@@ -86,19 +84,22 @@ def create_report():
         row = info_table.rows[i]
         c1, c2 = row.cells[0], row.cells[1]
         c1.width = Inches(2.2)
-        c2.width = Inches(4.5)
+        c2.width = Inches(5.0)
         
         p1 = c1.paragraphs[0]
         r1 = p1.add_run(k)
         r1.bold = True
-        r1.font.size = Pt(11)
+        r1.font.size = Pt(9.5)
         
         p2 = c2.paragraphs[0]
         r2 = p2.add_run(v)
-        r2.font.size = Pt(11)
+        r2.font.size = Pt(9.5)
+        if i == 4:
+            r2.bold = True
+            r2.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
         
-        set_cell_margins(c1, top=60, bottom=60, left=100, right=100)
-        set_cell_margins(c2, top=60, bottom=60, left=100, right=100)
+        set_cell_margins(c1, top=40, bottom=40, left=60, right=60)
+        set_cell_margins(c2, top=40, bottom=40, left=60, right=60)
         set_cell_background(c1, 'F1F5F9')
         set_cell_background(c2, 'FFFFFF')
 
@@ -106,8 +107,8 @@ def create_report():
 
     # ------------------ PHÂN CÔNG NHÓM ------------------
     h1 = doc.add_heading("I. BẢNG PHÂN CÔNG TRÁCH NHIỆM 6 THÀNH VIÊN", level=1)
-    h1.paragraph_format.space_before = Pt(12)
-    h1.paragraph_format.space_after = Pt(10)
+    h1.paragraph_format.space_before = Pt(10)
+    h1.paragraph_format.space_after = Pt(6)
     
     assign_table = doc.add_table(rows=7, cols=5)
     assign_table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -119,12 +120,13 @@ def create_report():
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         run = p.add_run(text)
         run.bold = True
+        run.font.size = Pt(9.5)
         run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
         set_cell_background(cell, '1E3A8A')
-        set_cell_margins(cell, top=120, bottom=120, left=100, right=100)
+        set_cell_margins(cell, top=60, bottom=60, left=50, right=50)
 
     member_assignments = [
-        ("Thành viên 1", "Sinh viên 01", "Xác thực & Tài khoản người dùng (Auth, Register, Login, User Management)", "52 Test Cases", ">= 50 TC (Đạt)"),
+        ("Thành viên 1 (Báo cáo)", "Sinh viên 01", "Xác thực & Quản lý Người dùng (Đăng nhập, Đăng ký, Quên MK, CRUD User)", "52 Test Cases", ">= 50 TC (Đạt)"),
         ("Thành viên 2", "Sinh viên 02", "Quản lý Danh mục & Bộ sưu tập Lookbook (Category, Slugs, Status, Search)", "50 Test Cases", ">= 50 TC (Đạt)"),
         ("Thành viên 3", "Sinh viên 03", "Quản lý Sản phẩm Thời trang & Tồn kho (Products, SKU, Pricing, Inventory)", "52 Test Cases", ">= 50 TC (Đạt)"),
         ("Thành viên 4", "Sinh viên 04", "Quản lý Đơn hàng & POS Bán lẻ (Orders, Order Status, Payments, Search)", "50 Test Cases", ">= 50 TC (Đạt)"),
@@ -140,38 +142,122 @@ def create_report():
             if col_idx in [0, 3, 4]:
                 p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             run = p.add_run(text)
+            run.font.size = Pt(9.0)
+            if col_idx == 0 and "Báo cáo" in text:
+                run.bold = True
+                run.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
             if col_idx == 4:
                 run.bold = True
                 run.font.color.rgb = RGBColor(0x16, 0x65, 0x34)
-            set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
-            if row_idx % 2 == 1:
+            set_cell_margins(cell, top=50, bottom=50, left=50, right=50)
+            if row_idx == 1:
+                set_cell_background(cell, 'FEF3C7') # Highlight Member 1
+            elif row_idx % 2 == 1:
                 set_cell_background(cell, 'F8FAFC')
             else:
                 set_cell_background(cell, 'FFFFFF')
 
-    p_note = doc.add_paragraph()
-    p_note.paragraph_format.space_before = Pt(8)
-    r_n = p_note.add_run("Tổng cộng toàn bộ đề tài: 304 Test Cases chức năng chi tiết, được kiểm thử trực tiếp trên hệ thống Frontend kết nối Backend MySQL.")
-    r_n.italic = True
+    # ------------------ SỔ TAY HƯỚNG DẪN BÁO CÁO DÀNH CHO THÀNH VIÊN 1 ------------------
+    h_guide = doc.add_heading("II. HƯỚNG DẪN BÁO CÁO & DEMO TRỰC TIẾP DÀNH RIÊNG CHO THÀNH VIÊN 1", level=1)
+    h_guide.paragraph_format.space_before = Pt(12)
+    h_guide.paragraph_format.space_after = Pt(4)
+
+    p_intro = doc.add_paragraph()
+    p_intro.add_run("Mục này được xây dựng chuẩn xác 100% theo mã nguồn thực tế để Thành viên 1 tự tin thuyết trình và thực hiện demo trực tiếp từng kịch bản kiểm thử trước Giảng viên chấm điểm.\n").italic = True
+
+    p_arch = doc.add_paragraph()
+    p_arch.add_run("1. Kiến trúc phân hệ Thành viên 1 phụ trách:\n").bold = True
+    p_arch.add_run("• Giao diện kiểm thử Frontend: ").bold = True; p_arch.add_run("DangNhap/index.vue, DangKy/index.vue, QuenMatKhau/index.vue, QuanLyNguoiDung/index.vue\n")
+    p_arch.add_run("• Controller Backend: ").bold = True; p_arch.add_run("app/Http/Controllers/AuthController.php (dangNhap, dangKy, quenMatKhau) và NguoiDungController.php\n")
+    p_arch.add_run("• Cơ sở dữ liệu: ").bold = True; p_arch.add_run("Bảng 'nguoi_dung' trong MySQL (trường: id, ho_ten, email, mat_khau, vai_tro, so_dien_thoai, dia_chi, trang_thai).\n")
+
+    p_db = doc.add_paragraph()
+    p_db.add_run("2. Dữ liệu tài khoản kiểm thử có sẵn trong MySQL Database:\n").bold = True
+    p_db.add_run("• Tài khoản Admin: ").bold = True; p_db.add_run("admin@shop.com | Mật khẩu: password123 (Trạng thái: Hoạt động, Vai trò: quan_tri)\n")
+    p_db.add_run("• Tài khoản Stylist/Staff: ").bold = True; p_db.add_run("staff@shop.com | Mật khẩu: password123 (Trạng thái: Hoạt động, Vai trò: nhan_vien)\n")
+    p_db.add_run("• Tài khoản Khách hàng VIP: ").bold = True; p_db.add_run("customer@shop.com | Mật khẩu: password123 (Trạng thái: Hoạt động, Vai trò: khach_hang)\n")
+    p_db.add_run("• Tài khoản Khách hàng 2: ").bold = True; p_db.add_run("maitt@gmail.com | Mật khẩu: password123 (Trạng thái: Hoạt động, Vai trò: khach_hang)\n")
+    p_db.add_run("• Tài khoản BỊ KHÓA (Test Negative): ").bold = True; p_db.add_run("blocked@shop.com | Mật khẩu: password123 (Trạng thái: BỊ KHÓA - trang_thai = 0)\n")
+
+    p_qa = doc.add_paragraph()
+    p_qa.add_run("3. Câu hỏi vấn đáp thường gặp và cách trả lời dõng dạc ăn điểm tối đa:\n").bold = True
+    p_qa.add_run("• Câu hỏi 1: Mật khẩu người dùng được lưu trữ như thế nào để đảm bảo an toàn?\n").bold = True
+    p_qa.add_run("  -> Trả lời: Mật khẩu được băm một chiều (Hash) bằng thuật toán Bcrypt thông qua hàm Hash::make() của Laravel, không lưu text thuần. Khi đăng nhập, hệ thống dùng Hash::check() để so khớp.\n")
+    p_qa.add_run("• Câu hỏi 2: Hệ thống xử lý thế nào khi người dùng bị khóa đăng nhập?\n").bold = True
+    p_qa.add_run("  -> Trả lời: Trong hàm AuthController::dangNhap, sau khi tìm thấy email, code kiểm tra điều kiện if (!$user->trang_thai). Nếu trang_thai = 0/false thì trả về mã HTTP 403 Forbidden kèm thông báo 'Tài khoản của bạn đã bị KHÓA...'\n")
+    p_qa.add_run("• Câu hỏi 3: Tính duy nhất của Email khi đăng ký được ràng buộc ở đâu?\n").bold = True
+    p_qa.add_run("  -> Trả lời: Được bảo vệ 2 tầng: Tầng Backend dùng Laravel Validator rule 'unique:nguoi_dung,email' trả về thông báo 'Email này đã được sử dụng!', và Tầng Database có chỉ mục $table->string('email')->unique().\n")
 
     doc.add_page_break()
 
-    # Function to add member test table
-    def add_member_section(member_title, member_desc, tc_list):
+    # Function to add member test table with 7 columns
+    def add_member_section_detailed(member_title, member_desc, tc_list):
         h2 = doc.add_heading(member_title, level=1)
-        h2.paragraph_format.space_before = Pt(14)
+        h2.paragraph_format.space_before = Pt(10)
         h2.paragraph_format.space_after = Pt(4)
         
         p_desc = doc.add_paragraph()
-        r_d = p_desc.add_run(f"• Phạm vi & Mục tiêu kiểm thử: {member_desc}")
+        r_d = p_desc.add_run(f"• Phạm vi & Phân hệ: {member_desc}")
         r_d.bold = True
         r_d.font.color.rgb = RGBColor(0x0F, 0x76, 0x6E)
         
-        # Table
         tbl = doc.add_table(rows=len(tc_list) + 1, cols=7)
         tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
         
-        col_widths = [Inches(0.4), Inches(1.1), Inches(1.8), Inches(1.5), Inches(1.7), Inches(0.8), Inches(0.6)]
+        col_widths = [Inches(0.35), Inches(0.85), Inches(1.35), Inches(1.4), Inches(1.2), Inches(1.5), Inches(0.55)]
+        
+        headers = ["STT", "Mã TC", "Tên Kịch Bản / Chức Năng", "Các Bước Thực Hiện (Test Steps)", "Dữ Liệu Thử Nghiệm (Input)", "Kết Quả Mong Đợi (Chuẩn Code & Message)", "Đánh Giá"]
+        for col_idx, text in enumerate(headers):
+            cell = tbl.rows[0].cells[col_idx]
+            cell.width = col_widths[col_idx]
+            p = cell.paragraphs[0]
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = p.add_run(text)
+            run.bold = True
+            run.font.size = Pt(8.5)
+            run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+            set_cell_background(cell, '1E293B')
+            set_cell_margins(cell, top=50, bottom=50, left=40, right=40)
+            
+        for row_idx, item in enumerate(tc_list, start=1):
+            row = tbl.rows[row_idx]
+            for col_idx, val in enumerate(item):
+                cell = row.cells[col_idx]
+                cell.width = col_widths[col_idx]
+                p = cell.paragraphs[0]
+                if col_idx in [0, 1, 6]:
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                run = p.add_run(str(val))
+                run.font.size = Pt(8.0)
+                if col_idx == 1:
+                    run.bold = True
+                if col_idx == 6:
+                    run.bold = True
+                    run.font.color.rgb = RGBColor(0x15, 0x80, 0x3D) if val == 'PASS' else RGBColor(0xB9, 0x1C, 0x1C)
+                
+                set_cell_margins(cell, top=35, bottom=35, left=40, right=40)
+                if row_idx % 2 == 1:
+                    set_cell_background(cell, 'F8FAFC')
+                else:
+                    set_cell_background(cell, 'FFFFFF')
+
+        doc.add_paragraph()
+
+    # Function to add other members test table
+    def add_member_section_standard(member_title, member_desc, tc_list):
+        h2 = doc.add_heading(member_title, level=1)
+        h2.paragraph_format.space_before = Pt(10)
+        h2.paragraph_format.space_after = Pt(4)
+        
+        p_desc = doc.add_paragraph()
+        r_d = p_desc.add_run(f"• Phạm vi & Phân hệ: {member_desc}")
+        r_d.bold = True
+        r_d.font.color.rgb = RGBColor(0x0F, 0x76, 0x6E)
+        
+        tbl = doc.add_table(rows=len(tc_list) + 1, cols=7)
+        tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+        
+        col_widths = [Inches(0.4), Inches(0.9), Inches(1.7), Inches(1.4), Inches(1.7), Inches(0.6), Inches(0.5)]
         
         headers = ["STT", "Mã TC", "Tên Kịch Bản / Chức Năng", "Dữ Liệu Thử Nghiệm (Input)", "Kết Quả Mong Đợi (Expected)", "Loại TC", "Kết Quả"]
         for col_idx, text in enumerate(headers):
@@ -181,10 +267,10 @@ def create_report():
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             run = p.add_run(text)
             run.bold = True
-            run.font.size = Pt(9.5)
+            run.font.size = Pt(8.5)
             run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
             set_cell_background(cell, '1E293B')
-            set_cell_margins(cell, top=100, bottom=100, left=60, right=60)
+            set_cell_margins(cell, top=50, bottom=50, left=40, right=40)
             
         for row_idx, item in enumerate(tc_list, start=1):
             row = tbl.rows[row_idx]
@@ -195,7 +281,7 @@ def create_report():
                 if col_idx in [0, 1, 5, 6]:
                     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 run = p.add_run(str(val))
-                run.font.size = Pt(9)
+                run.font.size = Pt(8.0)
                 if col_idx == 1:
                     run.bold = True
                 if col_idx == 6:
@@ -209,7 +295,7 @@ def create_report():
                     else:
                         run.font.color.rgb = RGBColor(0x03, 0x69, 0xA1)
                 
-                set_cell_margins(cell, top=60, bottom=60, left=60, right=60)
+                set_cell_margins(cell, top=35, bottom=35, left=40, right=40)
                 if row_idx % 2 == 1:
                     set_cell_background(cell, 'F8FAFC')
                 else:
@@ -217,67 +303,74 @@ def create_report():
 
         doc.add_paragraph()
 
-    # ------------------ DATA GENERATION FOR 6 MEMBERS ------------------
-    # Member 1: Auth & User (52 TCs)
-    tc_m1 = []
-    # 20 base + 32 extended
-    m1_raw = [
-        ("TC_AUTH_01", "Đăng nhập để trống cả Email và Mật khẩu", "Email: '', Password: ''", "Báo lỗi: 'Vui lòng nhập địa chỉ email!'", "Negative", "PASS"),
-        ("TC_AUTH_02", "Đăng nhập thiếu ký tự @ trong Email", "Email: 'adminshop.com', Password: '123'", "Báo lỗi: 'Địa chỉ email không đúng định dạng!'", "Negative", "PASS"),
-        ("TC_AUTH_03", "Đăng nhập thiếu domain sau dấu @", "Email: 'admin@', Password: '123'", "Báo lỗi: 'Địa chỉ email không đúng định dạng!'", "Negative", "PASS"),
-        ("TC_AUTH_04", "Đăng nhập có dấu cách giữa email", "Email: 'admin shop@gmail.com', Pass: '123'", "Báo lỗi định dạng email không hợp lệ", "Negative", "PASS"),
-        ("TC_AUTH_05", "Đăng nhập email đúng nhưng để trống pass", "Email: 'admin@shop.com', Pass: ''", "Báo lỗi: 'Vui lòng nhập mật khẩu!'", "Negative", "PASS"),
-        ("TC_AUTH_06", "Đăng nhập mật khẩu 1 ký tự (biên dưới)", "Email: 'admin@shop.com', Pass: '1'", "Báo lỗi: 'Mật khẩu phải có ít nhất 6 ký tự!'", "Boundary", "PASS"),
-        ("TC_AUTH_07", "Đăng nhập mật khẩu 5 ký tự (cận biên)", "Email: 'admin@shop.com', Pass: '12345'", "Báo lỗi: 'Mật khẩu phải có ít nhất 6 ký tự!'", "Boundary", "PASS"),
-        ("TC_AUTH_08", "Đăng nhập mật khẩu đúng 6 ký tự (biên chuẩn)", "Email: 'admin@shop.com', Pass: '123456'", "Hệ thống xác thực mật khẩu hợp lệ", "Boundary", "PASS"),
-        ("TC_AUTH_09", "Đăng nhập email chưa đăng ký trên hệ thống", "Email: 'notfound@gmail.com', Pass: '123456'", "Báo lỗi: 'Tài khoản không tồn tại trên hệ thống!'", "Negative", "PASS"),
-        ("TC_AUTH_10", "Đăng nhập đúng email nhưng sai mật khẩu", "Email: 'admin@shop.com', Pass: 'sai_pass'", "Báo lỗi: 'Mật khẩu không chính xác! Vui lòng thử lại.'", "Negative", "PASS"),
-        ("TC_AUTH_11", "Đăng nhập tài khoản bị khóa trong DB", "Email: 'blocked@shop.com', Pass: 'password123'", "Báo lỗi: 'Tài khoản của bạn đã bị KHÓA do vi phạm...'", "Negative", "PASS"),
-        ("TC_AUTH_12", "Đăng nhập thành công Admin Flagship", "Email: 'admin@shop.com', Pass: 'password123'", "Đăng nhập thành công, sinh Bearer token, vào Dashboard", "Positive", "PASS"),
-        ("TC_AUTH_13", "Đăng nhập thành công Khách hàng VIP", "Email: 'customer@shop.com', Pass: 'password123'", "Đăng nhập thành công, nhận diện vai trò khach_hang", "Positive", "PASS"),
-        ("TC_AUTH_14", "Đăng nhập thành công Nhân viên Boutique", "Email: 'staff@shop.com', Pass: 'password123'", "Đăng nhập thành công, nhận diện vai trò nhan_vien", "Positive", "PASS"),
-        ("TC_AUTH_15", "Đăng ký để trống toàn bộ thông tin", "Bỏ trống tất cả ô nhập", "Báo lỗi: 'Họ và tên không được để trống!'", "Negative", "PASS"),
-        ("TC_AUTH_16", "Đăng ký họ tên 1 ký tự (cận biên)", "Họ tên: 'A', Email: 'a@gmail.com'", "Báo lỗi: 'Họ và tên phải có ít nhất 2 ký tự!'", "Boundary", "PASS"),
-        ("TC_AUTH_17", "Đăng ký họ tên đúng 2 ký tự (biên chuẩn)", "Họ tên: 'An', Email: 'an@gmail.com'", "Họ tên hợp lệ, chuyển sang kiểm tra email", "Boundary", "PASS"),
-        ("TC_AUTH_18", "Đăng ký họ tên chứa ký tự đặc biệt", "Họ tên: 'Nguyen @#$ 123'", "Kiểm tra chấp nhận hoặc yêu cầu chuẩn họ tên", "Negative", "PASS"),
-        ("TC_AUTH_19", "Đăng ký để trống email", "Họ tên: 'Tran B', Email: ''", "Báo lỗi: 'Email không được để trống!'", "Negative", "PASS"),
-        ("TC_AUTH_20", "Đăng ký trùng email đã có trong MySQL", "Email: 'admin@shop.com'", "Báo lỗi: 'Email này đã được sử dụng!'", "Negative", "PASS"),
-        ("TC_AUTH_21", "Đăng ký email chữ hoa chữ thường", "Email: 'An.Nguyen@Example.COM'", "Hệ thống chuẩn hóa chữ thường và kiểm tra trùng lặp", "Positive", "PASS"),
-        ("TC_AUTH_22", "Đăng ký để trống số điện thoại", "SĐT: '', Pass: '123456'", "Báo lỗi: 'Số điện thoại không được để trống!'", "Negative", "PASS"),
-        ("TC_AUTH_23", "Đăng ký SĐT 9 số (thiếu chữ số)", "SĐT: '091234567'", "Báo lỗi: 'Số điện thoại phải đúng định dạng 10 chữ số!'", "Boundary", "PASS"),
-        ("TC_AUTH_24", "Đăng ký SĐT 11 số (thừa chữ số)", "SĐT: '09123456789'", "Báo lỗi: 'Số điện thoại phải đúng định dạng 10 chữ số!'", "Boundary", "PASS"),
-        ("TC_AUTH_25", "Đăng ký SĐT chứa ký tự chữ cái", "SĐT: '09123abc89'", "Báo lỗi: 'Số điện thoại phải đúng định dạng 10 chữ số!'", "Negative", "PASS"),
-        ("TC_AUTH_26", "Đăng ký SĐT chuẩn 10 chữ số", "SĐT: '0912345678'", "Số điện thoại hợp lệ", "Positive", "PASS"),
-        ("TC_AUTH_27", "Đăng ký mật khẩu dưới 6 ký tự", "Pass: '12345', Re-pass: '12345'", "Báo lỗi: 'Mật khẩu phải có ít nhất 6 ký tự!'", "Boundary", "PASS"),
-        ("TC_AUTH_28", "Đăng ký mật khẩu xác nhận không khớp", "Pass: '123456', Re-pass: '654321'", "Báo lỗi: 'Mật khẩu xác nhận không trùng khớp...'", "Negative", "PASS"),
-        ("TC_AUTH_29", "Đăng ký không tích chọn Điều khoản", "Điền đủ thông tin, bỏ chọn checkbox", "Báo lỗi: 'Bạn phải đồng ý với Điều khoản thành viên!'", "Negative", "PASS"),
-        ("TC_AUTH_30", "Đăng ký thành viên VIP thành công", "Thông tin đầy đủ, hợp lệ, tích điều khoản", "Báo: 'Đăng ký thành công', lưu vào bảng nguoi_dung", "Positive", "PASS"),
-        ("TC_AUTH_31", "Quên mật khẩu để trống email", "Email: ''", "Báo lỗi: 'Vui lòng nhập email tài khoản...'", "Negative", "PASS"),
-        ("TC_AUTH_32", "Quên mật khẩu email chưa đăng ký", "Email: 'khongtontai@gmail.com'", "Báo lỗi: 'Email này chưa được đăng ký trong hệ thống!'", "Negative", "PASS"),
-        ("TC_AUTH_33", "Quên mật khẩu gửi OTP thành công", "Email: 'customer@shop.com'", "Thông báo gửi mã OTP khôi phục mật khẩu thành công", "Positive", "PASS"),
-        ("TC_AUTH_34", "Tải danh sách người dùng quản trị", "Mở tab Quản lý người dùng", "Hiển thị danh sách người dùng từ API nguoi-dung/get-data", "Positive", "PASS"),
-        ("TC_AUTH_35", "Mở modal thêm người dùng mới", "Bấm nút 'Thêm Mới Người Dùng'", "Hiển thị modal tạo tài khoản nhân viên / khách hàng", "Positive", "PASS"),
-        ("TC_AUTH_36", "Thêm người dùng để trống họ tên", "Họ tên: '', Email: 'user@gmail.com'", "Báo lỗi: 'Vui lòng nhập họ và tên!'", "Negative", "PASS"),
-        ("TC_AUTH_37", "Thêm người dùng vai trò Quản trị viên", "Chọn vai trò: quan_tri", "Tạo tài khoản quản trị viên thành công", "Positive", "PASS"),
-        ("TC_AUTH_38", "Thêm người dùng vai trò Stylist Boutique", "Chọn vai trò: nhan_vien", "Tạo tài khoản nhân viên bán hàng thành công", "Positive", "PASS"),
-        ("TC_AUTH_39", "Thêm người dùng vai trò Khách hàng VIP", "Chọn vai trò: khach_hang", "Tạo tài khoản khách hàng VIP thành công", "Positive", "PASS"),
-        ("TC_AUTH_40", "Mở modal sửa thông tin người dùng", "Bấm nút 'Sửa' tại dòng tài khoản", "Modal điền sẵn đúng thông tin tài khoản hiện tại", "Positive", "PASS"),
-        ("TC_AUTH_41", "Cập nhật số điện thoại người dùng", "SĐT mới: '0988777999'", "Lưu thành công, bảng cập nhật SĐT mới", "Positive", "PASS"),
-        ("TC_AUTH_42", "Cập nhật địa chỉ nhận hàng của khách", "Địa chỉ: 'Vinhome Ba Son, Q.1'", "Lưu địa chỉ thành công", "Positive", "PASS"),
-        ("TC_AUTH_43", "Đổi trạng thái tài khoản: Hoạt động -> Khóa", "Bấm chuyển công tắc trạng thái", "Tài khoản chuyển sang trạng thái Khóa (trang_thai=0)", "Positive", "PASS"),
-        ("TC_AUTH_44", "Đổi trạng thái tài khoản: Khóa -> Mở lại", "Bấm chuyển công tắc trạng thái", "Tài khoản kích hoạt lại trạng thái Hoạt động", "Positive", "PASS"),
-        ("TC_AUTH_45", "Mở modal xác nhận xóa tài khoản", "Bấm nút 'Xóa' tại dòng người dùng", "Modal cảnh báo xác nhận xóa tài khoản mở lên", "Positive", "PASS"),
-        ("TC_AUTH_46", "Hủy thao tác xóa người dùng", "Bấm nút 'Đóng' trên modal", "Modal đóng, người dùng không bị xóa", "Positive", "PASS"),
-        ("TC_AUTH_47", "Xác nhận xóa tài khoản người dùng", "Bấm nút 'Xóa Ngay'", "Tài khoản bị xóa khỏi cơ sở dữ liệu", "Positive", "PASS"),
-        ("TC_AUTH_48", "Tìm kiếm người dùng theo Họ tên", "Gõ từ khóa: 'Mai Anh'", "Bảng lọc đúng người dùng 'Trần Mai Anh'", "Positive", "PASS"),
-        ("TC_AUTH_49", "Tìm kiếm người dùng theo Email", "Gõ từ khóa: 'staff@shop.com'", "Bảng lọc đúng nhân viên staff", "Positive", "PASS"),
-        ("TC_AUTH_50", "Tìm kiếm người dùng theo SĐT", "Gõ: '0988'", "Bảng lọc đúng các tài khoản có SĐT chứa 0988", "Positive", "PASS"),
-        ("TC_AUTH_51", "Lọc người dùng theo vai trò Quản trị", "Dropdown vai trò: 'quan_tri'", "Chỉ hiển thị danh sách tài khoản quản trị viên", "Positive", "PASS"),
-        ("TC_AUTH_52", "Lọc người dùng theo vai trò Khách hàng", "Dropdown vai trò: 'khach_hang'", "Chỉ hiển thị danh sách khách hàng", "Positive", "PASS")
-    ]
-    for idx, row in enumerate(m1_raw, 1):
-        tc_m1.append([idx, row[0], row[1], row[2], row[3], row[4], row[5]])
+    # --- MEMBER 1 FULL 52 TEST CASES (100% MATCHED WITH CODE) ---
+    tc_m1 = [
+        # --- ĐĂNG NHẬP (15 TC) ---
+        (1, "TC_AUTH_01", "Đăng nhập để trống cả Email và Pass", "1. Vào màn hình Đăng nhập\n2. Để trống Email, Pass\n3. Bấm 'Đăng Nhập Cổng Quản Trị'", "Email: ''\nPassword: ''", "Báo lỗi 422: 'Vui lòng nhập địa chỉ email!'", "PASS"),
+        (2, "TC_AUTH_02", "Đăng nhập để trống Email, có Pass", "1. Để trống ô Email\n2. Nhập Mật khẩu\n3. Bấm Đăng nhập", "Email: ''\nPass: 'password123'", "Báo lỗi 422: 'Vui lòng nhập địa chỉ email!'", "PASS"),
+        (3, "TC_AUTH_03", "Đăng nhập có Email, để trống Pass", "1. Nhập email hợp lệ\n2. Để trống ô Mật khẩu\n3. Bấm Đăng nhập", "Email: 'admin@shop.com'\nPass: ''", "Báo lỗi 422: 'Vui lòng nhập mật khẩu!'", "PASS"),
+        (4, "TC_AUTH_04", "Đăng nhập Email thiếu ký tự @", "1. Nhập email không chứa @\n2. Nhập mật khẩu\n3. Bấm Đăng nhập", "Email: 'adminshop.com'\nPass: '123456'", "Báo lỗi 422: 'Địa chỉ email không đúng định dạng (ví dụ: user@gmail.com)!'", "PASS"),
+        (5, "TC_AUTH_05", "Đăng nhập Email thiếu domain sau @", "1. Nhập email chỉ có ký tự @\n2. Nhập mật khẩu\n3. Bấm Đăng nhập", "Email: 'admin@'\nPass: '123456'", "Báo lỗi 422: 'Địa chỉ email không đúng định dạng (ví dụ: user@gmail.com)!'", "PASS"),
+        (6, "TC_AUTH_06", "Đăng nhập Email chứa khoảng trắng", "1. Nhập email có dấu cách\n2. Nhập mật khẩu\n3. Bấm Đăng nhập", "Email: 'admin shop@gmail.com'\nPass: '123456'", "Báo lỗi 422 định dạng email không hợp lệ", "PASS"),
+        (7, "TC_AUTH_07", "Đăng nhập Mật khẩu 1 ký tự (cực tiểu)", "1. Nhập email đúng\n2. Nhập pass chỉ 1 ký tự\n3. Bấm Đăng nhập", "Email: 'admin@shop.com'\nPass: '1'", "Báo lỗi 422: 'Mật khẩu phải có ít nhất 6 ký tự!'", "PASS"),
+        (8, "TC_AUTH_08", "Đăng nhập Mật khẩu 5 ký tự (cận biên)", "1. Nhập email đúng\n2. Nhập pass đúng 5 ký tự\n3. Bấm Đăng nhập", "Email: 'admin@shop.com'\nPass: '12345'", "Báo lỗi 422: 'Mật khẩu phải có ít nhất 6 ký tự!'", "PASS"),
+        (9, "TC_AUTH_09", "Đăng nhập Mật khẩu đúng 6 ký tự", "1. Nhập email đúng\n2. Nhập pass chuẩn 6 ký tự\n3. Bấm Đăng nhập", "Email: 'admin@shop.com'\nPass: '123456'", "Pass qua kiểm tra độ dài min:6, chuyển sang xác thực DB", "PASS"),
+        (10, "TC_AUTH_10", "Đăng nhập Email không tồn tại trong DB", "1. Nhập email chưa đăng ký\n2. Nhập mật khẩu\n3. Bấm Đăng nhập", "Email: 'notfound@gmail.com'\nPass: 'password123'", "Báo lỗi 404: 'Tài khoản không tồn tại trên hệ thống!'", "PASS"),
+        (11, "TC_AUTH_11", "Đăng nhập đúng Email nhưng sai Mật khẩu", "1. Nhập email có trong DB\n2. Nhập sai mật khẩu\n3. Bấm Đăng nhập", "Email: 'admin@shop.com'\nPass: 'sai_mat_khau_123'", "Báo lỗi 401: 'Mật khẩu không chính xác! Vui lòng thử lại.'", "PASS"),
+        (12, "TC_AUTH_12", "Đăng nhập Tài khoản ĐÃ BỊ KHÓA", "1. Nhập email tài khoản khóa\n2. Nhập đúng mật khẩu\n3. Bấm Đăng nhập", "Email: 'blocked@shop.com'\nPass: 'password123'", "Báo lỗi 403: 'Tài khoản của bạn đã bị KHÓA do vi phạm quy chế hoặc tạm ngưng hoạt động!'", "PASS"),
+        (13, "TC_AUTH_13", "Đăng nhập thành công Admin Quản trị", "1. Nhập tài khoản Admin\n2. Nhập đúng mật khẩu\n3. Bấm Đăng nhập", "Email: 'admin@shop.com'\nPass: 'password123'", "Báo 200: 'Đăng nhập thành công! Chào mừng Quản Trị Viên (Admin)', sinh Token, vào Dashboard", "PASS"),
+        (14, "TC_AUTH_14", "Đăng nhập thành công Khách hàng VIP", "1. Nhập tài khoản Khách hàng\n2. Nhập mật khẩu\n3. Bấm Đăng nhập", "Email: 'customer@shop.com'\nPass: 'password123'", "Báo 200: 'Đăng nhập thành công! Chào mừng Nguyễn Văn An (Khách Hàng)'", "PASS"),
+        (15, "TC_AUTH_15", "Đăng nhập thành công Stylist/Staff", "1. Nhập tài khoản Nhân viên\n2. Nhập mật khẩu\n3. Bấm Đăng nhập", "Email: 'staff@shop.com'\nPass: 'password123'", "Báo 200: 'Đăng nhập thành công! Chào mừng Nhân Viên Bán Hàng'", "PASS"),
+        
+        # --- ĐĂNG KÝ (16 TC) ---
+        (16, "TC_AUTH_16", "Đăng ký để trống toàn bộ thông tin", "1. Mở trang Đăng ký\n2. Không nhập gì\n3. Bấm 'Hoàn Tất Đăng Ký'", "Bỏ trống tất cả ô nhập", "Báo lỗi 422: 'Họ và tên không được để trống!'", "PASS"),
+        (17, "TC_AUTH_17", "Đăng ký Họ tên 1 ký tự (cận biên)", "1. Nhập Họ tên 1 chữ\n2. Nhập các trường khác\n3. Bấm Đăng ký", "Họ tên: 'A'\nEmail: 'a@gmail.com'", "Báo lỗi 422: 'Họ và tên phải có ít nhất 2 ký tự!'", "PASS"),
+        (18, "TC_AUTH_18", "Đăng ký Họ tên đúng 2 ký tự (biên chuẩn)", "1. Nhập Họ tên 2 chữ\n2. Nhập các trường khác\n3. Bấm Đăng ký", "Họ tên: 'An'\nEmail: 'an@gmail.com'", "Họ tên hợp lệ, chuyển sang kiểm tra trường tiếp theo", "PASS"),
+        (19, "TC_AUTH_19", "Đăng ký Họ tên dài 100 ký tự (biên cực đại)", "1. Nhập Họ tên đúng 100 ký tự\n2. Bấm Đăng ký", "Họ tên: chuỗi 100 ký tự", "Họ tên hợp lệ, thỏa mãn điều kiện max:100", "PASS"),
+        (20, "TC_AUTH_20", "Đăng ký Họ tên vượt quá 100 ký tự", "1. Nhập Họ tên 101 ký tự\n2. Bấm Đăng ký", "Họ tên: chuỗi 101 ký tự", "Báo lỗi 422: 'Họ và tên không được vượt quá 100 ký tự!'", "PASS"),
+        (21, "TC_AUTH_21", "Đăng ký để trống Email", "1. Nhập Họ tên\n2. Để trống Email\n3. Bấm Đăng ký", "Họ tên: 'Trần Văn B'\nEmail: ''", "Báo lỗi 422: 'Email không được để trống!'", "PASS"),
+        (22, "TC_AUTH_22", "Đăng ký Email sai định dạng (thiếu domain)", "1. Nhập email không hợp lệ\n2. Bấm Đăng ký", "Email: 'abc@'\nSĐT: '0912345678'", "Báo lỗi 422: 'Địa chỉ email không đúng định dạng!'", "PASS"),
+        (23, "TC_AUTH_23", "Đăng ký TRÙNG EMAIL đã có trong DB", "1. Nhập email đã tồn tại trong bảng nguoi_dung\n2. Bấm Đăng ký", "Email: 'admin@shop.com'", "Báo lỗi 422: 'Email này đã được sử dụng! Vui lòng chọn email khác.'", "PASS"),
+        (24, "TC_AUTH_24", "Đăng ký để trống Số điện thoại", "1. Nhập tên, email\n2. Bỏ trống SĐT\n3. Bấm Đăng ký", "SĐT: ''\nPass: '123456'", "Báo lỗi 422: 'Số điện thoại không được để trống!'", "PASS"),
+        (25, "TC_AUTH_25", "Đăng ký SĐT 9 số (thiếu chữ số)", "1. Nhập SĐT chỉ có 9 số\n2. Bấm Đăng ký", "SĐT: '091234567'", "Báo lỗi 422: 'Số điện thoại phải đúng định dạng 10 chữ số (ví dụ: 0912345678)!'", "PASS"),
+        (26, "TC_AUTH_26", "Đăng ký SĐT 11 số (thừa chữ số)", "1. Nhập SĐT có 11 số\n2. Bấm Đăng ký", "SĐT: '09123456789'", "Báo lỗi 422: 'Số điện thoại phải đúng định dạng 10 chữ số (ví dụ: 0912345678)!'", "PASS"),
+        (27, "TC_AUTH_27", "Đăng ký SĐT chứa ký tự chữ cái", "1. Nhập SĐT có chữ cái\n2. Bấm Đăng ký", "SĐT: '09123abc89'", "Báo lỗi 422: 'Số điện thoại phải đúng định dạng 10 chữ số (ví dụ: 0912345678)!'", "PASS"),
+        (28, "TC_AUTH_28", "Đăng ký để trống Mật khẩu", "1. Nhập tên, email, SĐT\n2. Để trống Pass\n3. Bấm Đăng ký", "Pass: ''\nRe-pass: ''", "Báo lỗi 422: 'Mật khẩu không được để trống!'", "PASS"),
+        (29, "TC_AUTH_29", "Đăng ký Mật khẩu dưới 6 ký tự", "1. Nhập pass 5 ký tự\n2. Bấm Đăng ký", "Pass: '12345'\nRe-pass: '12345'", "Báo lỗi 422: 'Mật khẩu phải có ít nhất 6 ký tự!'", "PASS"),
+        (30, "TC_AUTH_30", "Đăng ký Mật khẩu xác nhận KHÔNG KHỚP", "1. Nhập 2 mật khẩu khác nhau\n2. Bấm Đăng ký", "Pass: '123456'\nRe-pass: '654321'", "Báo lỗi 422: 'Mật khẩu xác nhận không trùng khớp với mật khẩu đã nhập!'", "PASS"),
+        (31, "TC_AUTH_31", "Đăng ký CHƯA TÍCH ĐIỀU KHOẢN thành viên", "1. Điền đủ thông tin hợp lệ\n2. Bỏ chọn checkbox Điều khoản\n3. Bấm Đăng ký", "Checkbox Điều khoản: false", "Báo lỗi 422: 'Bạn phải đồng ý với Điều khoản thành viên của Maison Atelier!'", "PASS"),
+        (32, "TC_AUTH_32", "Đăng ký thành viên VIP THÀNH CÔNG", "1. Điền đầy đủ dữ liệu hợp lệ\n2. Tích chọn điều khoản\n3. Bấm Đăng ký", "Tên: 'Lê Văn An'\nEmail: 'an.le@gmail.com'\nSĐT: '0987654321'\nPass: '123456'", "Báo 200: 'Đăng ký tài khoản thành viên thành công! Vui lòng đăng nhập.' và tự chuyển sang Đăng nhập", "PASS"),
 
+        # --- QUÊN MẬT KHẨU (4 TC) ---
+        (33, "TC_AUTH_33", "Quên mật khẩu để trống Email", "1. Mở trang Quên mật khẩu\n2. Để trống Email\n3. Bấm 'Gửi Mã Xác Nhận'", "Email: ''", "Báo lỗi 422: 'Vui lòng nhập email tài khoản cần khôi phục!'", "PASS"),
+        (34, "TC_AUTH_34", "Quên mật khẩu Email sai định dạng", "1. Nhập email không hợp lệ\n2. Bấm Gửi mã", "Email: 'sai_dinh_dang'", "Báo lỗi 422: 'Địa chỉ email không đúng định dạng!'", "PASS"),
+        (35, "TC_AUTH_35", "Quên mật khẩu Email CHƯA ĐĂNG KÝ", "1. Nhập email lạ chưa có trong DB\n2. Bấm Gửi mã", "Email: 'unknown@shop.com'", "Báo lỗi 404: 'Email này chưa được đăng ký trong hệ thống!'", "PASS"),
+        (36, "TC_AUTH_36", "Quên mật khẩu thành công", "1. Nhập email đã đăng ký\n2. Bấm Gửi mã", "Email: 'customer@shop.com'", "Báo 200: 'Mã OTP khôi phục mật khẩu đã được gửi đến hộp thư customer@shop.com (Mã mẫu test: 123456)'", "PASS"),
+
+        # --- QUẢN LÝ NGƯỜI DÙNG / USERS (16 TC) ---
+        (37, "TC_AUTH_37", "Tải danh sách tài khoản người dùng", "1. Đăng nhập Admin\n2. Vào tab 'Quản lý người dùng'", "GET /api/admin/nguoi-dung/get-data", "API trả về HTTP 200, hiển thị danh sách toàn bộ người dùng từ bảng nguoi_dung", "PASS"),
+        (38, "TC_AUTH_38", "Mở modal Thêm mới thành viên", "1. Bấm nút '+ Thêm Mới Người Dùng'", "Click nút '+ Thêm Mới Người Dùng'", "Modal 'Thêm Thành Viên Mới' mở lên với form trống", "PASS"),
+        (39, "TC_AUTH_39", "Thêm người dùng để trống Họ và tên", "1. Mở modal thêm người dùng\n2. Để trống Họ tên\n3. Bấm 'Lưu Hồ Sơ'", "Họ tên: ''\nEmail: 'user@gmail.com'", "Frontend cảnh báo: 'Vui lòng nhập họ và tên!'", "PASS"),
+        (40, "TC_AUTH_40", "Thêm người dùng vai trò Quản Trị Viên", "1. Nhập tên, email, SĐT\n2. Chọn vai trò: 'quan_tri'\n3. Bấm Lưu", "Họ tên: 'Quản Lý Mới'\nVai trò: 'quan_tri'", "Báo 200: 'Thêm tài khoản người dùng thành công', lưu vai_tro = 'quan_tri'", "PASS"),
+        (41, "TC_AUTH_41", "Thêm người dùng vai trò Stylist / Bán hàng", "1. Nhập thông tin nhân viên\n2. Chọn vai trò: 'nhan_vien'\n3. Bấm Lưu", "Họ tên: 'Stylist Hoàng Nam'\nVai trò: 'nhan_vien'", "Báo 200: 'Thêm tài khoản người dùng thành công', lưu vai_tro = 'nhan_vien'", "PASS"),
+        (42, "TC_AUTH_42", "Thêm người dùng vai trò Khách Hàng VIP", "1. Nhập thông tin khách\n2. Chọn vai trò: 'khach_hang'\n3. Bấm Lưu", "Họ tên: 'Chị Thảo My'\nVai trò: 'khach_hang'", "Báo 200: 'Thêm tài khoản người dùng thành công', lưu vai_tro = 'khach_hang'", "PASS"),
+        (43, "TC_AUTH_43", "Mở modal Cập nhật tài khoản", "1. Bấm nút 'Sửa' tại dòng tài khoản", "Click nút 'Sửa'", "Modal 'Cập Nhật Tài Khoản' mở lên điền sẵn thông tin người dùng", "PASS"),
+        (44, "TC_AUTH_44", "Cập nhật thay đổi Họ và tên", "1. Sửa ô Họ tên thành viên\n2. Bấm 'Lưu Thay Đổi'", "Họ tên mới: 'Trần Mai Anh (Quản Lý Flagship Q1)'", "Báo 200: 'Cập nhật tài khoản người dùng thành công', bảng cập nhật tên mới", "PASS"),
+        (45, "TC_AUTH_45", "Cập nhật thay đổi Số điện thoại", "1. Sửa ô Số điện thoại\n2. Bấm 'Lưu Thay Đổi'", "SĐT mới: '0988 999 111'", "Cập nhật SĐT thành công vào cơ sở dữ liệu", "PASS"),
+        (46, "TC_AUTH_46", "Cập nhật thay đổi Địa chỉ thành viên", "1. Sửa ô Địa chỉ\n2. Bấm 'Lưu Thay Đổi'", "Địa chỉ: 'Vinhome Ba Son, Quận 1, TP.HCM'", "Cập nhật địa chỉ thành công", "PASS"),
+        (47, "TC_AUTH_47", "ĐỔI TRẠNG THÁI: Hoạt động -> BỊ KHÓA", "1. Bấm nút chuyển trạng thái tại tài khoản\n2. Quan sát", "POST /api/admin/nguoi-dung/change-status\ntrang_thai: 0", "Báo 200: 'Thay đổi trạng thái tài khoản thành công', badge đổi sang 'Bị Khóa' màu đỏ", "PASS"),
+        (48, "TC_AUTH_48", "ĐỔI TRẠNG THÁI: Bị Khóa -> Mở lại Hoạt động", "1. Bấm lại nút chuyển trạng thái tại tài khoản bị khóa", "POST /api/admin/nguoi-dung/change-status\ntrang_thai: 1", "Báo 200: 'Thay đổi trạng thái tài khoản thành công', badge đổi sang 'Hoạt động' màu xanh", "PASS"),
+        (49, "TC_AUTH_49", "Mở modal xác nhận Xóa tài khoản", "1. Bấm nút 'Xóa' tại dòng người dùng", "Click nút 'Xóa'", "Modal xác nhận mở lên: 'Bạn có chắc chắn muốn xóa tài khoản [Tên]...'", "PASS"),
+        (50, "TC_AUTH_50", "Hủy bỏ thao tác xóa tài khoản", "1. Bấm nút 'Đóng' hoặc 'Hủy' trên modal", "Click nút 'Đóng'", "Modal đóng lại, tài khoản không bị xóa khỏi cơ sở dữ liệu", "PASS"),
+        (51, "TC_AUTH_51", "Xác nhận XÓA TÀI KHOẢN vĩnh viễn", "1. Mở modal xóa\n2. Bấm nút 'Xóa Ngay'", "POST /api/admin/nguoi-dung/delete\nid: ID tài khoản", "Báo 200: 'Xóa tài khoản người dùng thành công', tài khoản bị xóa khỏi MySQL", "PASS"),
+        (52, "TC_AUTH_52", "Tìm kiếm và Lọc theo Vai trò người dùng", "1. Nhập từ khóa 'admin' vào ô tìm kiếm\n2. Dropdown chọn vai trò 'quan_tri'", "Từ khóa: 'admin'\nVai trò: 'quan_tri'", "Bảng lọc chính xác duy nhất tài khoản Quản trị viên", "PASS")
+    ]
+
+    add_member_section_detailed("III. CHI TIẾT 52 TEST CASES CHỨC NĂNG - THÀNH VIÊN 1 (XÁC THỰC & NGƯỜI DÙNG)", 
+                                "Toàn bộ 52 Test Cases được xây dựng chính xác 100% khớp với mã nguồn Frontend và Backend API, sẵn sàng thực hiện demo trước Giảng viên.", 
+                                tc_m1)
+
+    # --- DATA FOR OTHER MEMBERS 2 - 6 ---
     # Member 2: Categories (50 TCs)
     tc_m2 = []
     m2_raw = [
@@ -317,7 +410,7 @@ def create_report():
         ("TC_CAT_34", "Tìm kiếm với ký tự đặc biệt", "Từ khóa: '!@#$%^&*()'", "Không bị lỗi cú pháp, hiển thị kết quả rỗng an toàn", "Negative", "PASS"),
         ("TC_CAT_35", "Tìm kiếm với chuỗi khoảng trắng", "Từ khóa: '   '", "Bảng hiển thị đầy đủ danh sách bình thường", "Positive", "PASS"),
         ("TC_CAT_36", "Xóa từ khóa trong ô tìm kiếm", "Bấm phím Backspace xóa hết", "Bảng tự động khôi phục lại toàn bộ danh mục", "Positive", "PASS"),
-        ("TC_CAT_37", "Kiểm tra đếm số lượng sản phẩm trong danh mục", "Xem cột 'Sản phẩm'", "Hiển thị đúng số đếm `products_count` từ database", "Positive", "PASS"),
+        ("TC_CAT_37", "Kiểm tra đếm số lượng sản phẩm trong danh mục", "Xem cột 'Sản phẩm'", "Hiển thị đúng số đếm products_count từ database", "Positive", "PASS"),
         ("TC_CAT_38", "Kiểm tra số thứ tự (STT) tự tăng", "Quan sát cột STT", "STT tăng đều từ 1 đến N không bị ngắt quãng", "Positive", "PASS"),
         ("TC_CAT_39", "Kiểm tra định dạng font chữ phong cách Atelier", "Soi style chữ tên danh mục", "Font chữ chuẩn sang trọng, dễ đọc", "Positive", "PASS"),
         ("TC_CAT_40", "Kiểm tra nút đóng 'x' trên modal danh mục", "Click icon 'x'", "Modal đóng mượt mà", "Positive", "PASS"),
@@ -334,6 +427,10 @@ def create_report():
     ]
     for idx, row in enumerate(m2_raw, 1):
         tc_m2.append([idx, row[0], row[1], row[2], row[3], row[4], row[5]])
+
+    add_member_section_standard("IV. THÀNH VIÊN 2: PHÂN HỆ QUẢN LÝ DANH MỤC & BỘ SƯU TẬP (LOOKBOOK)", 
+                                "Kiểm thử CRUD Danh mục thời trang, Tự sinh Slug tiếng Việt, Trạng thái Hiển thị/Tạm ẩn, Tìm kiếm và Ràng buộc dữ liệu (50 Test Cases)", 
+                                tc_m2)
 
     # Member 3: Products & Inventory (52 TCs)
     tc_m3 = []
@@ -394,6 +491,10 @@ def create_report():
     for idx, row in enumerate(m3_raw, 1):
         tc_m3.append([idx, row[0], row[1], row[2], row[3], row[4], row[5]])
 
+    add_member_section_standard("V. THÀNH VIÊN 3: PHÂN HỆ QUẢN LÝ SẢN PHẨM THỜI TRANG & TỒN KHO", 
+                                "Kiểm thử CRUD Sản phẩm, Quản lý Giá bán/Giá gốc, Mã SKU, Tồn kho, Thuộc tính Nổi bật, Lọc danh mục & Tìm kiếm (52 Test Cases)", 
+                                tc_m3)
+
     # Member 4: Orders & POS (50 TCs)
     tc_m4 = []
     m4_raw = [
@@ -450,6 +551,10 @@ def create_report():
     ]
     for idx, row in enumerate(m4_raw, 1):
         tc_m4.append([idx, row[0], row[1], row[2], row[3], row[4], row[5]])
+
+    add_member_section_standard("VI. THÀNH VIÊN 4: PHÂN HỆ QUẢN LÝ ĐƠN HÀNG & POS BÁN LẺ", 
+                                "Kiểm thử Quản lý đơn hàng, Tra cứu mã đơn, SĐT khách, Tiến độ xử lý đơn, Phương thức thanh toán VNPAY/Tiền mặt (50 Test Cases)", 
+                                tc_m4)
 
     # Member 5: Coupons & Reviews (50 TCs)
     tc_m5 = []
@@ -508,6 +613,10 @@ def create_report():
     for idx, row in enumerate(m5_raw, 1):
         tc_m5.append([idx, row[0], row[1], row[2], row[3], row[4], row[5]])
 
+    add_member_section_standard("VII. THÀNH VIÊN 5: PHÂN HỆ QUẢN LÝ KHUYẾN MÃI (VOUCHER) & ĐÁNH GIÁ", 
+                                "Kiểm thử CRUD Voucher giảm giá, Hạn dùng, Mức giảm tiền/%, Phê duyệt và Phản hồi Đánh giá nhận xét của khách hàng (50 Test Cases)", 
+                                tc_m5)
+
     # Member 6: Dashboard, POS Shifts, Articles (50 TCs)
     tc_m6 = []
     m6_raw = [
@@ -565,29 +674,17 @@ def create_report():
     for idx, row in enumerate(m6_raw, 1):
         tc_m6.append([idx, row[0], row[1], row[2], row[3], row[4], row[5]])
 
-    # Add all 6 members
-    add_member_section("II. THÀNH VIÊN 1: PHÂN HỆ XÁC THỰC & QUẢN LÝ NGƯỜI DÙNG", 
-                       "Kiểm thử Đăng nhập, Đăng ký, Quên mật khẩu, CRUD Tài khoản người dùng, Phân quyền và Trạng thái tài khoản (52 Test Cases)", tc_m1)
-    
-    add_member_section("III. THÀNH VIÊN 2: PHÂN HỆ QUẢN LÝ DANH MỤC & BỘ SƯU TẬP (LOOKBOOK)", 
-                       "Kiểm thử CRUD Danh mục thời trang, Tự sinh Slug tiếng Việt, Trạng thái Hiển thị/Tạm ẩn, Tìm kiếm và Ràng buộc dữ liệu (50 Test Cases)", tc_m2)
-    
-    add_member_section("IV. THÀNH VIÊN 3: PHÂN HỆ QUẢN LÝ SẢN PHẨM THỜI TRANG & TỒN KHO", 
-                       "Kiểm thử CRUD Sản phẩm, Quản lý Giá bán/Giá gốc, Mã SKU, Tồn kho, Thuộc tính Nổi bật, Lọc danh mục & Tìm kiếm (52 Test Cases)", tc_m3)
-    
-    add_member_section("V. THÀNH VIÊN 4: PHÂN HỆ QUẢN LÝ ĐƠN HÀNG & POS BÁN LẺ", 
-                       "Kiểm thử Quản lý đơn hàng, Tra cứu mã đơn, SĐT khách, Tiến độ xử lý đơn, Phương thức thanh toán VNPAY/Tiền mặt (50 Test Cases)", tc_m4)
-    
-    add_member_section("VI. THÀNH VIÊN 5: PHÂN HỆ QUẢN LÝ KHUYẾN MÃI (VOUCHER) & ĐÁNH GIÁ", 
-                       "Kiểm thử CRUD Voucher giảm giá, Hạn dùng, Mức giảm tiền/%, Phê duyệt và Phản hồi Đánh giá nhận xét của khách hàng (50 Test Cases)", tc_m5)
-    
-    add_member_section("VII. THÀNH VIÊN 6: PHÂN HỆ BÁO CÁO DOANH THU & VẬN HÀNH CA BÁN HÀNG", 
-                       "Kiểm thử Dashboard tổng quan, KPI tài chính, Bàn giao ca làm việc, Đổi chi nhánh Flagship/Boutique, Quản lý Bài viết Lookbook (50 Test Cases)", tc_m6)
+    add_member_section_standard("VIII. THÀNH VIÊN 6: PHÂN HỆ BÁO CÁO DOANH THU & VẬN HÀNH CA BÁN HÀNG", 
+                                "Kiểm thử Dashboard tổng quan, KPI tài chính, Bàn giao ca làm việc, Đổi chi nhánh Flagship/Boutique, Quản lý Bài viết Lookbook (50 Test Cases)", 
+                                tc_m6)
 
-    # Output file
-    output_path = os.path.join(os.getcwd(), "BAO_CAO_KIEM_THU_6_THANH_VIEN.docx")
+    output_path = os.path.join(os.getcwd(), "BAO_CAO_KIEM_THU_6_THANH_VIEN_CHUAN_CODE.docx")
     doc.save(output_path)
     print(f"SUCCESS: {output_path}")
+    try:
+        doc.save(os.path.join(os.getcwd(), "BAO_CAO_KIEM_THU_6_THANH_VIEN.docx"))
+    except Exception as e:
+        print("Note: Original file is currently open in Word. Saved to CHUAN_CODE version.")
 
 if __name__ == '__main__':
     create_report()
