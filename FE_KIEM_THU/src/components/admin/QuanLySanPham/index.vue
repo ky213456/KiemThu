@@ -11,10 +11,10 @@
 
       <div class="page-actions">
         <button type="button" class="btn-secondary-atelier" @click="loadData">
-          <span>🔄</span> Tải Lại Dữ Liệu
+          <i class="bi bi-arrow-clockwise"></i> Tải Lại Dữ Liệu
         </button>
         <button type="button" class="btn-primary-atelier" data-testid="btn-them-san-pham" @click="moModalThem">
-          <span>+</span> Thêm Mẫu Mới <span class="shortcut">F2</span>
+          <i class="bi bi-plus-circle-fill"></i> Thêm Mẫu Mới <span class="shortcut">F2</span>
         </button>
       </div>
     </div>
@@ -22,7 +22,7 @@
     <!-- BỘ LỌC TĨNH SANG TRỌNG -->
     <div class="filter-bar">
       <div class="search-field">
-        <span class="icon">🔍</span>
+        <span class="icon"><i class="bi bi-search"></i></span>
         <input
           type="text"
           v-model="tim_kiem"
@@ -49,7 +49,9 @@
           <option value="tam_an">Tạm ẩn lookbook</option>
         </select>
 
-        <button type="button" class="btn-reset" data-testid="btn-dat-lai-bo-loc" @click="datLaiBoLoc">Đặt lại</button>
+        <button type="button" class="btn-reset" data-testid="btn-dat-lai-bo-loc" @click="datLaiBoLoc">
+          <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+        </button>
       </div>
     </div>
 
@@ -105,8 +107,12 @@
               </button>
             </td>
             <td class="text-center">
-              <button type="button" class="btn-action edit" :data-testid="'btn-sua-' + (index + 1)" @click="moModalSua(item)">Sửa</button>
-              <button type="button" class="btn-action delete" :data-testid="'btn-xoa-' + (index + 1)" @click="moModalXoa(item)">Xóa</button>
+              <button type="button" class="btn-action edit" :data-testid="'btn-sua-' + (index + 1)" @click="moModalSua(item)">
+                <i class="bi bi-pencil-square"></i> Sửa
+              </button>
+              <button type="button" class="btn-action delete" :data-testid="'btn-xoa-' + (index + 1)" @click="moModalXoa(item)">
+                <i class="bi bi-trash3-fill"></i> Xóa
+              </button>
             </td>
           </tr>
           <tr v-if="list_san_pham_filter.length === 0">

@@ -10,13 +10,13 @@
 
       <div class="page-actions">
         <button type="button" class="btn-secondary-atelier" @click="loadData">
-          <span>🔄</span> Tải Lại Dữ Liệu
+          <i class="bi bi-arrow-clockwise"></i> Tải Lại Dữ Liệu
         </button>
         <button type="button" class="btn-secondary-atelier" @click="hienModalTieuChuan = true">
-          <span>🏷️</span> Tiêu Chuẩn Duyệt
+          <i class="bi bi-patch-check-fill"></i> Tiêu Chuẩn Duyệt
         </button>
         <button type="button" class="btn-primary-atelier" data-testid="btn-phan-hoi-khach" @click="moModalPhanHoi">
-          <span>💬</span> Phản Hồi Chung
+          <i class="bi bi-chat-dots-fill"></i> Phản Hồi Chung
         </button>
       </div>
     </div>
@@ -24,7 +24,7 @@
     <!-- BỘ LỌC TĨNH SANG TRỌNG -->
     <div class="filter-bar">
       <div class="search-field">
-        <span class="icon">🔍</span>
+        <span class="icon"><i class="bi bi-search"></i></span>
         <input
           id="tim-kiem-review"
           type="text"
@@ -52,7 +52,7 @@
           <option value="an">Tạm ẩn nhận xét</option>
         </select>
 
-        <button type="button" class="btn-reset" @click="datLaiBoLoc">Đặt lại</button>
+        <button type="button" class="btn-reset" @click="datLaiBoLoc"><i class="bi bi-arrow-counterclockwise"></i> Đặt lại</button>
       </div>
     </div>
 
@@ -283,10 +283,10 @@ export default {
 
     guiPhanHoi() {
       if (!this.noiDungPhanHoi.trim()) {
-        alert('Vui lòng nhập nội dung phản hồi!');
+        this.$toast ? this.$toast.warning('Vui lòng nhập nội dung phản hồi!') : alert('Vui lòng nhập nội dung phản hồi!');
         return;
       }
-      alert('Đã gửi phản hồi thành công đến hòm thư khách hàng!');
+      this.$toast ? this.$toast.success('Đã gửi phản hồi thành công đến hòm thư khách hàng!') : alert('Đã gửi phản hồi thành công đến hòm thư khách hàng!');
       this.hienModalDetail = false;
     },
 
@@ -295,14 +295,14 @@ export default {
         .post('http://127.0.0.1:8000/api/admin/danh-gia/change-status', { id: item.id, trang_thai: trang_thai_moi })
         .then(res => {
           if (res.data.status == 1 || res.data.status == true) {
-            alert(res.data.message || 'Cập nhật trạng thái đánh giá thành công!');
+            this.$toast ? this.$toast.success(res.data.message || 'Cập nhật trạng thái đánh giá thành công!') : alert(res.data.message || 'Cập nhật trạng thái đánh giá thành công!');
             item.trang_thai = trang_thai_moi;
           }
         })
         .catch(err => {
           console.error('Lỗi đổi trạng thái đánh giá:', err);
           item.trang_thai = trang_thai_moi;
-          alert('Đã cập nhật trạng thái nhận xét!');
+          this.$toast ? this.$toast.success('Đã cập nhật trạng thái nhận xét!') : alert('Đã cập nhật trạng thái nhận xét!');
         });
     }
   }

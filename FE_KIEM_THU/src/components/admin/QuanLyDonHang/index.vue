@@ -11,10 +11,10 @@
 
       <div class="page-actions">
         <button type="button" class="btn-secondary-atelier" @click="loadData">
-          <span>🔄</span> Tải Lại Dữ Liệu
+          <i class="bi bi-arrow-clockwise"></i> Tải Lại Dữ Liệu
         </button>
         <button type="button" class="btn-primary-atelier" data-testid="btn-them-don-hang" @click="moModalThemDon">
-          <span>+</span> Lập Đơn POS Mới
+          <i class="bi bi-plus-circle-fill"></i> Lập Đơn POS Mới
         </button>
       </div>
     </div>
@@ -22,7 +22,7 @@
     <!-- BỘ LỌC TĨNH -->
     <div class="filter-bar">
       <div class="search-field">
-        <span class="icon">🔍</span>
+        <span class="icon"><i class="bi bi-search"></i></span>
         <input
           type="text"
           v-model="tim_kiem"
@@ -49,7 +49,7 @@
           <option value="tien_mat">Tiền mặt tại quầy</option>
         </select>
 
-        <button type="button" class="btn-reset" data-testid="btn-dat-lai-don-hang" @click="datLaiBoLoc">Đặt lại</button>
+        <button type="button" class="btn-reset" data-testid="btn-dat-lai-don-hang" @click="datLaiBoLoc"><i class="bi bi-arrow-counterclockwise"></i> Đặt lại</button>
       </div>
     </div>
 
@@ -95,9 +95,9 @@
               </span>
             </td>
             <td class="text-center action-col">
-              <button type="button" class="btn-action view" :data-testid="'btn-xem-' + (index + 1)" @click="moModalDon(item)">Chi tiết</button>
-              <button type="button" class="btn-action print" :data-testid="'btn-in-bill-' + (index + 1)" @click="moModalInHoaDon(item)">In</button>
-              <button type="button" class="btn-action delete" :data-testid="'btn-xoa-' + (index + 1)" @click="xoaDonHang(item)">Xóa</button>
+              <button type="button" class="btn-action view" :data-testid="'btn-xem-' + (index + 1)" @click="moModalDon(item)"><i class="bi bi-eye"></i> Chi tiết</button>
+              <button type="button" class="btn-action print" :data-testid="'btn-in-bill-' + (index + 1)" @click="moModalInHoaDon(item)"><i class="bi bi-printer"></i> In</button>
+              <button type="button" class="btn-action delete" :data-testid="'btn-xoa-' + (index + 1)" @click="xoaDonHang(item)"><i class="bi bi-trash3-fill"></i> Xóa</button>
             </td>
           </tr>
           <tr v-if="list_don_hang_filter.length === 0">
@@ -645,7 +645,7 @@ export default {
         .post('http://127.0.0.1:8000/api/admin/don-hang/create', this.don_moi)
         .then(res => {
           if (res.data.status === true || res.data.status == 1) {
-            alert(res.data.message || 'Tạo đơn hàng POS thành công!');
+            this.$toast ? this.$toast.success(res.data.message || 'Tạo đơn hàng POS thành công!') : alert(res.data.message || 'Tạo đơn hàng POS thành công!');
             this.hienModalThemDon = false;
             this.loadData();
             this.loadSanPham();
@@ -671,14 +671,14 @@ export default {
 
       Promise.all([p1, p2])
         .then(() => {
-          alert('Cập nhật tiến độ & thanh toán đơn hàng thành công!');
+          this.$toast ? this.$toast.success('Cập nhật tiến độ & thanh toán đơn hàng thành công!') : alert('Cập nhật tiến độ & thanh toán đơn hàng thành công!');
           this.hienModalDonHang = false;
           this.loadData();
           this.loadSanPham();
         })
         .catch(err => {
           console.error('Lỗi cập nhật đơn:', err);
-          alert(err.response?.data?.message || 'Có lỗi khi cập nhật!');
+          const msgErr = err.response?.data?.message || 'Có lỗi khi cập nhật!'; this.$toast ? this.$toast.error(msgErr) : alert(msgErr);
         });
     },
 
@@ -688,15 +688,15 @@ export default {
           .post('http://127.0.0.1:8000/api/admin/don-hang/delete', { id: item.id })
           .then(res => {
             if (res.data.status === true || res.data.status == 1) {
-              alert('Xóa đơn hàng thành công!');
+              this.$toast ? this.$toast.success('Xóa đơn hàng thành công!') : alert('Xóa đơn hàng thành công!');
               this.loadData();
               this.loadSanPham();
             } else {
-              alert(res.data.message || 'Xóa đơn hàng thất bại!');
+              const msgDelFail = res.data.message || 'Xóa đơn hàng thất bại!'; this.$toast ? this.$toast.error(msgDelFail) : alert(msgDelFail);
             }
           })
           .catch(err => {
-            alert(err.response?.data?.message || 'Có lỗi khi xóa đơn hàng!');
+            const msgDelErr = err.response?.data?.message || 'Có lỗi khi xóa đơn hàng!'; this.$toast ? this.$toast.error(msgDelErr) : alert(msgDelErr);
           });
       }
     },

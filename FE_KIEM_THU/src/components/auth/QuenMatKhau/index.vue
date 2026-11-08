@@ -14,15 +14,17 @@
 
       <!-- Thông báo -->
       <div v-if="thongBaoLoi" class="alert-box alert-error">
-        <span>⚠️ {{ thongBaoLoi }}</span>
+        <span><i class="bi bi-exclamation-circle-fill"></i> {{ thongBaoLoi }}</span>
       </div>
       <div v-if="thongBaoThanhCong" class="alert-box alert-success">
-        <span>✅ {{ thongBaoThanhCong }}</span>
+        <span><i class="bi bi-check-circle-fill"></i> {{ thongBaoThanhCong }}</span>
       </div>
 
       <form data-testid="form-quen-mat-khau" @submit.prevent="xuLyQuenMatKhau">
         <div class="form-group">
-          <label for="forgot-email" class="form-label required">Địa chỉ Email tài khoản:</label>
+          <label for="forgot-email" class="form-label required">
+            <i class="bi bi-envelope-at"></i> Địa chỉ Email tài khoản:
+          </label>
           <input
             id="forgot-email"
             type="email"
@@ -38,14 +40,18 @@
           class="btn-submit"
           data-testid="btn-forgot-submit"
           @click="xuLyQuenMatKhau"
+          :disabled="isLoading"
         >
-          Gửi Hướng Dẫn Khôi Phục
+          <span v-if="isLoading"><i class="bi bi-arrow-repeat spin"></i> Đang gửi...</span>
+          <span v-else><i class="bi bi-send-fill"></i> Gửi Hướng Dẫn Khôi Phục</span>
         </button>
       </form>
 
       <div class="auth-footer">
         Đã nhớ lại mật khẩu?
-        <a href="#" class="switch-link" data-testid="link-quay-lai-dang-nhap" @click.prevent="$emit('chuyen-tab', 'dang_nhap')">Quay lại đăng nhập</a>
+        <a href="#" class="switch-link" data-testid="link-quay-lai-dang-nhap" @click.prevent="$emit('chuyen-tab', 'dang_nhap')">
+          <i class="bi bi-arrow-left"></i> Quay lại đăng nhập
+        </a>
       </div>
     </div>
   </div>
@@ -54,6 +60,7 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { toast } from '@/utils/toast'
 
 const emit = defineEmits(['chuyen-tab'])
 
@@ -73,15 +80,20 @@ function xuLyQuenMatKhau() {
     })
     .then(res => {
       if (res.data.status === true || res.data.status == 1) {
-        thongBaoThanhCong.value = res.data.message || 'Mã OTP khôi phục đã được gửi về email của bạn!'
+        const msg = res.data.message || 'Mã OTP khôi phục đã được gửi về email của bạn!'
+        thongBaoThanhCong.value = msg
+        toast.success(msg, 'Đã Gửi Hướng Dẫn')
       } else {
-        thongBaoLoi.value = res.data.message || 'Yêu cầu không thành công!'
+        const msg = res.data.message || 'Yêu cầu không thành công!'
+        thongBaoLoi.value = msg
+        toast.error(msg, 'Yêu Cầu Thất Bại')
       }
     })
     .catch(err => {
       console.error('Lỗi quên mật khẩu:', err)
       const msg = err.response?.data?.message || 'Có lỗi xảy ra khi gửi yêu cầu!'
       thongBaoLoi.value = msg
+      toast.error(msg, 'Yêu Cầu Thất Bại')
     })
     .finally(() => {
       isLoading.value = false

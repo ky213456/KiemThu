@@ -2,18 +2,20 @@
   <div class="quan-ly-danh-muc" data-testid="page-quan-ly-danh-muc">
     <div class="header-action">
       <div>
-        <h2 class="title" data-testid="title-quan-ly-danh-muc">Quản Lý Danh Mục Áo Quần</h2>
+        <h2 class="title" data-testid="title-quan-ly-danh-muc">
+          <i class="bi bi-collection-fill text-primary"></i> Quản Lý Danh Mục Áo Quần
+        </h2>
         <p class="subtitle">Quản lý các nhóm thời trang: Áo nam, Áo nữ, Quần nam, Váy đầm...</p>
       </div>
       <button type="button" class="btn btn-primary" data-testid="btn-them-danh-muc" @click="moModalThem">
-        <span>+</span> Thêm Danh Mục Mới
+        <i class="bi bi-plus-circle-fill"></i> Thêm Danh Mục Mới
       </button>
     </div>
 
     <!-- Thanh tìm kiếm -->
     <div class="filter-card">
       <div class="search-box">
-        <label for="tim-kiem-dm">Tìm kiếm danh mục:</label>
+        <label for="tim-kiem-dm"><i class="bi bi-search"></i> Tìm kiếm danh mục:</label>
         <input
           id="tim-kiem-dm"
           type="text"
@@ -55,12 +57,17 @@
                 @click="doiTrangThai(item)"
                 :title="'Click để đổi trạng thái'"
               >
+                <i :class="(item.trang_thai == 1 || item.trang_thai == true) ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'"></i>
                 {{ (item.trang_thai == 1 || item.trang_thai == true) ? 'Hiển thị' : 'Tạm ẩn' }}
               </button>
             </td>
             <td class="text-center action-buttons">
-              <button type="button" class="btn-sm btn-edit" :data-testid="'btn-sua-dm-' + (index + 1)" @click="moModalSua(item)">Sửa</button>
-              <button type="button" class="btn-sm btn-delete" :data-testid="'btn-xoa-dm-' + (index + 1)" @click="moModalXoa(item)">Xóa</button>
+              <button type="button" class="btn-sm btn-edit" :data-testid="'btn-sua-dm-' + (index + 1)" @click="moModalSua(item)">
+                <i class="bi bi-pencil-square"></i> Sửa
+              </button>
+              <button type="button" class="btn-sm btn-delete" :data-testid="'btn-xoa-dm-' + (index + 1)" @click="moModalXoa(item)">
+                <i class="bi bi-trash3-fill"></i> Xóa
+              </button>
             </td>
           </tr>
           <tr v-if="list_danh_muc_filter.length === 0">

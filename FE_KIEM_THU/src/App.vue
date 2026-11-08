@@ -1,11 +1,13 @@
 <template>
   <div class="maison-app" data-testid="app-root">
+    <!-- Toast Thông Báo Đẹp Mắt Toàn Hệ Thống -->
+    <ToastContainer />
     
     <!-- 1. VIEW AUTH: ĐĂNG NHẬP / ĐĂNG KÝ (NẾU CHỌN TAB AUTH) -->
     <div v-if="laTrangAuth" class="auth-fullscreen">
       <div v-if="daDangNhap" class="auth-top-switch">
         <button class="btn-back-atelier" data-testid="btn-ve-admin" @click="chuyenTab('tong_quan')">
-          ← Quay lại Maison Atelier Dashboard
+          <i class="bi bi-arrow-left"></i> Quay lại Maison Atelier Dashboard
         </button>
       </div>
 
@@ -49,7 +51,7 @@
             data-testid="sidebar-tong-quan"
             @click.prevent="chuyenTab('tong_quan')"
           >
-            <span class="menu-icon">📊</span>
+            <span class="menu-icon"><i class="bi bi-speedometer2"></i></span>
             <span class="menu-text">Báo cáo doanh số</span>
             <span class="live-pill">LIVE</span>
           </a>
@@ -62,7 +64,7 @@
             data-testid="sidebar-san-pham"
             @click.prevent="chuyenTab('quan_ly_san_pham')"
           >
-            <span class="menu-icon">👗</span>
+            <span class="menu-icon"><i class="bi bi-handbag-fill"></i></span>
             <span class="menu-text">Tất cả sản phẩm</span>
           </a>
           <a
@@ -71,7 +73,7 @@
             data-testid="sidebar-danh-muc"
             @click.prevent="chuyenTab('quan_ly_danh_muc')"
           >
-            <span class="menu-icon">📑</span>
+            <span class="menu-icon"><i class="bi bi-collection-fill"></i></span>
             <span class="menu-text">Bộ sưu tập / Lookbook</span>
           </a>
           <a
@@ -79,7 +81,7 @@
             :class="['menu-item', tabHienTai === 'quan_ly_san_pham' ? '' : '']"
             @click.prevent="chuyenTab('quan_ly_san_pham')"
           >
-            <span class="menu-icon">🏷️</span>
+            <span class="menu-icon"><i class="bi bi-tags-fill"></i></span>
             <span class="menu-text">Size & Màu sắc</span>
           </a>
           <a
@@ -87,7 +89,7 @@
             :class="['menu-item', tabHienTai === 'quan_ly_san_pham' ? '' : '']"
             @click.prevent="chuyenTab('quan_ly_san_pham')"
           >
-            <span class="menu-icon">⚠️</span>
+            <span class="menu-icon"><i class="bi bi-exclamation-triangle-fill text-warning"></i></span>
             <span class="menu-text">Tồn kho cảnh báo</span>
             <span class="dot-warning"></span>
           </a>
@@ -100,15 +102,15 @@
             data-testid="sidebar-don-hang"
             @click.prevent="chuyenTab('quan_ly_don_hang')"
           >
-            <span class="menu-icon">🛍️</span>
+            <span class="menu-icon"><i class="bi bi-receipt-cutoff"></i></span>
             <span class="menu-text">Đơn tại quầy & Online</span>
           </a>
           <a href="#" class="menu-item" @click.prevent="chuyenTab('quan_ly_don_hang')">
-            <span class="menu-icon">🔄</span>
+            <span class="menu-icon"><i class="bi bi-arrow-repeat"></i></span>
             <span class="menu-text">Quản lý trả hàng</span>
           </a>
           <a href="#" class="menu-item" @click.prevent="chuyenTab('quan_ly_don_hang')">
-            <span class="menu-icon">🚚</span>
+            <span class="menu-icon"><i class="bi bi-truck"></i></span>
             <span class="menu-text">Vận chuyển</span>
           </a>
 
@@ -120,7 +122,7 @@
             data-testid="sidebar-nguoi-dung"
             @click.prevent="chuyenTab('quan_ly_nguoi_dung')"
           >
-            <span class="menu-icon">💎</span>
+            <span class="menu-icon"><i class="bi bi-gem text-info"></i></span>
             <span class="menu-text">Khách hàng VIP</span>
           </a>
           <a
@@ -129,7 +131,7 @@
             data-testid="sidebar-voucher"
             @click.prevent="chuyenTab('quan_ly_ma_giam_gia')"
           >
-            <span class="menu-icon">🎟️</span>
+            <span class="menu-icon"><i class="bi bi-ticket-perforated-fill text-danger"></i></span>
             <span class="menu-text">Voucher & Ưu đãi</span>
           </a>
           <a
@@ -138,18 +140,18 @@
             data-testid="sidebar-danh-gia"
             @click.prevent="chuyenTab('quan_ly_danh_gia')"
           >
-            <span class="menu-icon">⭐</span>
+            <span class="menu-icon"><i class="bi bi-star-fill text-warning"></i></span>
             <span class="menu-text">Đánh giá Atelier</span>
           </a>
 
           <!-- MÀN HÌNH TEST AUTH -->
           <div class="menu-heading">MÀN HÌNH TEST XÁC THỰC</div>
           <a href="#" class="menu-item menu-item-test" @click.prevent="chuyenTab('dang_nhap')">
-            <span class="menu-icon">🔑</span>
+            <span class="menu-icon"><i class="bi bi-box-arrow-in-right"></i></span>
             <span class="menu-text">View Đăng Nhập</span>
           </a>
           <a href="#" class="menu-item menu-item-test" @click.prevent="chuyenTab('dang_ky')">
-            <span class="menu-icon">📝</span>
+            <span class="menu-icon"><i class="bi bi-person-plus-fill"></i></span>
             <span class="menu-text">View Đăng Ký</span>
           </a>
         </nav>
@@ -175,7 +177,7 @@
         <header class="atelier-topbar" data-testid="top-header">
           <!-- Thanh tìm kiếm rộng giữa màn hình -->
           <div class="topbar-search">
-            <span class="search-icon">🔍</span>
+            <span class="search-icon"><i class="bi bi-search"></i></span>
             <input
               type="text"
               v-model="tuKhoaTimKiem"
@@ -189,54 +191,54 @@
           <div class="topbar-actions">
             <!-- Nút chọn nhanh view kiểm thử -->
             <div class="view-tester-switch">
-              <span class="switch-tag">VIEW:</span>
+              <span class="switch-tag"><i class="bi bi-sliders"></i> VIEW:</span>
               <select :value="tabHienTai" class="select-page" @change="chuyenTab($event.target.value)">
-                <option value="tong_quan">📊 Báo cáo doanh số (Dashboard)</option>
-                <option value="quan_ly_san_pham">👗 Tất cả sản phẩm</option>
-                <option value="quan_ly_danh_muc">📑 Bộ sưu tập / Lookbook</option>
-                <option value="quan_ly_don_hang">🛍️ Bán hàng & Đơn hàng</option>
-                <option value="quan_ly_nguoi_dung">💎 Khách hàng VIP & Users</option>
-                <option value="quan_ly_ma_giam_gia">🎟️ Voucher & Ưu đãi</option>
-                <option value="quan_ly_danh_gia">⭐ Đánh giá Atelier</option>
-                <option value="dang_nhap">🔑 View Đăng nhập</option>
-                <option value="dang_ky">📝 View Đăng ký</option>
+                <option value="tong_quan">Báo cáo doanh số (Dashboard)</option>
+                <option value="quan_ly_san_pham">Tất cả sản phẩm</option>
+                <option value="quan_ly_danh_muc">Bộ sưu tập / Lookbook</option>
+                <option value="quan_ly_don_hang">Bán hàng & Đơn hàng</option>
+                <option value="quan_ly_nguoi_dung">Khách hàng VIP & Users</option>
+                <option value="quan_ly_ma_giam_gia">Voucher & Ưu đãi</option>
+                <option value="quan_ly_danh_gia">Đánh giá Atelier</option>
+                <option value="dang_nhap">View Đăng nhập</option>
+                <option value="dang_ky">View Đăng ký</option>
               </select>
             </div>
 
             <button type="button" class="btn-topbar" @click="hienModalChiNhanh = true">
-              <span class="icon">🏬</span> {{ chiNhanhHienTai }} <span class="arrow">▾</span>
+              <span class="icon"><i class="bi bi-shop"></i></span> {{ chiNhanhHienTai }} <i class="bi bi-chevron-down" style="font-size: 11px;"></i>
             </button>
 
             <button type="button" class="btn-topbar" @click="moModalBanGiaoCa">
-              <span class="icon">🔄</span> Bàn giao ca
+              <span class="icon"><i class="bi bi-arrow-left-right"></i></span> Bàn giao ca
             </button>
 
             <div class="btn-notification" @click="hienPopupThongBao = !hienPopupThongBao" title="Thông báo hệ thống">
-              <span class="bell-icon">🔔</span>
+              <span class="bell-icon"><i class="bi bi-bell-fill"></i></span>
               <span class="bell-dot"></span>
 
               <!-- Dropdown thông báo -->
               <div v-if="hienPopupThongBao" class="notification-dropdown" @click.stop>
                 <div class="noti-header">
-                  <strong>Thông Báo Atelier</strong>
+                  <strong><i class="bi bi-bell"></i> Thông Báo Atelier</strong>
                   <span class="noti-badge">3 mới</span>
                 </div>
                 <div class="noti-item">
-                  <span class="noti-icon">🛍️</span>
+                  <span class="noti-icon"><i class="bi bi-bag-check-fill text-success"></i></span>
                   <div>
                     <div class="noti-text">Đơn hàng mới <strong>#ORD-5821</strong> vừa được đặt tại quầy Q1.</div>
                     <small class="noti-time">Vừa xong</small>
                   </div>
                 </div>
                 <div class="noti-item">
-                  <span class="noti-icon">⚠️</span>
+                  <span class="noti-icon"><i class="bi bi-exclamation-circle-fill text-warning"></i></span>
                   <div>
                     <div class="noti-text">Mẫu <strong>Blazer Linen Be</strong> sắp hết size S (còn 2 chiếc).</div>
                     <small class="noti-time">10 phút trước</small>
                   </div>
                 </div>
                 <div class="noti-item">
-                  <span class="noti-icon">💎</span>
+                  <span class="noti-icon"><i class="bi bi-gem text-info"></i></span>
                   <div>
                     <div class="noti-text">Khách hàng VIP <strong>Chị Thảo My</strong> vừa ghé thăm showroom.</div>
                     <small class="noti-time">25 phút trước</small>
@@ -260,13 +262,13 @@
               <!-- Dropdown profile -->
               <div v-if="hienMenuProfile" class="profile-dropdown" @click.stop>
                 <div class="profile-dropdown-item" @click="chuyenTab('quan_ly_nguoi_dung'); hienMenuProfile = false">
-                  <span>👤</span> Hồ sơ nhân sự
+                  <i class="bi bi-person-circle"></i> Hồ sơ nhân sự
                 </div>
                 <div class="profile-dropdown-item" @click="chuyenTab('tong_quan'); hienMenuProfile = false">
-                  <span>📊</span> Báo cáo ca làm
+                  <i class="bi bi-bar-chart-line"></i> Báo cáo ca làm
                 </div>
                 <div class="profile-dropdown-item logout" @click="dangXuat">
-                  <span>🚪</span> Đăng xuất hệ thống
+                  <i class="bi bi-box-arrow-right"></i> Đăng xuất hệ thống
                 </div>
               </div>
             </div>
@@ -302,8 +304,8 @@
               :class="['branch-option', chiNhanhHienTai === cn ? 'active' : '']"
               @click="chonChiNhanh(cn)"
             >
-              <span>🏬 {{ cn }}</span>
-              <span v-if="chiNhanhHienTai === cn" class="branch-check">✓ Đang chọn</span>
+              <span><i class="bi bi-shop"></i> {{ cn }}</span>
+              <span v-if="chiNhanhHienTai === cn" class="branch-check"><i class="bi bi-check-circle-fill"></i> Đang chọn</span>
             </div>
           </div>
         </div>
@@ -342,6 +344,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+
+// Import Toast component & helper
+import ToastContainer from './components/common/ToastContainer.vue'
+import { toast } from './utils/toast'
 
 // Import components
 import TongQuan from './components/admin/TongQuan/index.vue'
@@ -400,7 +406,7 @@ const danhSachChiNhanh = ref([
 function chonChiNhanh(ten) {
   chiNhanhHienTai.value = ten.split(' - ')[0] + ' - Flagship'
   hienModalChiNhanh.value = false
-  alert('Đã chuyển quyền quản lý làm việc sang: ' + ten)
+  toast.success('Đã chuyển quyền quản lý làm việc sang: ' + ten, 'Chi Nhánh Hoạt Động')
 }
 
 function moModalBanGiaoCa() {
@@ -408,7 +414,7 @@ function moModalBanGiaoCa() {
 }
 
 function xacNhanBanGiaoCa() {
-  alert('Bàn giao ca thành công! Đã gửi biên bản đối soát két tiền 16.850.000đ về bộ phận kế toán.')
+  toast.success('Bàn giao ca thành công! Đã gửi biên bản đối soát két tiền 16.850.000đ về bộ phận kế toán.', 'Bàn Giao Ca POS')
   hienModalBanGiaoCa.value = false
 }
 
@@ -417,13 +423,13 @@ function dangXuat() {
   localStorage.removeItem('auth_token')
   localStorage.removeItem('auth_user')
   daDangNhap.value = false
-  alert('Đã đăng xuất khỏi hệ thống thành công!')
+  toast.info('Đã đăng xuất khỏi hệ thống thành công!', 'Đăng Xuất')
   tabHienTai.value = 'dang_nhap'
 }
 
 function timKiemTopbar() {
   if (!tuKhoaTimKiem.value.trim()) return
-  alert(`Tìm kiếm nhanh từ khóa: "${tuKhoaTimKiem.value}" trên toàn bộ hệ thống Atelier!`)
+  toast.info(`Tìm kiếm nhanh từ khóa: "${tuKhoaTimKiem.value}" trên toàn bộ hệ thống Atelier!`, 'Tìm Kiếm')
 }
 
 const laTrangAuth = computed(() => {
@@ -437,7 +443,7 @@ function chuyenTab(tab) {
 
   // Nếu truy cập vào trang quản trị mà chưa đăng nhập thì chặn lại
   if (!isAuthTab && !token) {
-    alert('Vui lòng đăng nhập tài khoản trước khi truy cập hệ thống quản trị!')
+    toast.warning('Vui lòng đăng nhập tài khoản trước khi truy cập hệ thống quản trị!', 'Yêu Cầu Đăng Nhập')
     tabHienTai.value = 'dang_nhap'
     return
   }

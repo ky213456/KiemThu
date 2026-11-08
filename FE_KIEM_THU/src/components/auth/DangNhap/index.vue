@@ -14,15 +14,17 @@
 
       <!-- Thông báo lỗi hoặc thành công nếu có -->
       <div v-if="thongBaoLoi" class="alert-box alert-error">
-        <span>⚠️ {{ thongBaoLoi }}</span>
+        <span><i class="bi bi-exclamation-circle-fill"></i> {{ thongBaoLoi }}</span>
       </div>
       <div v-if="thongBaoThanhCong" class="alert-box alert-success">
-        <span>✅ {{ thongBaoThanhCong }}</span>
+        <span><i class="bi bi-check-circle-fill"></i> {{ thongBaoThanhCong }}</span>
       </div>
 
       <form data-testid="form-dang-nhap" @submit.prevent="xuLyDangNhap">
         <div class="form-group">
-          <label for="login-email" class="form-label required">Địa chỉ Email / Mã nhân sự:</label>
+          <label for="login-email" class="form-label required">
+            <i class="bi bi-envelope-at"></i> Địa chỉ Email / Mã nhân sự:
+          </label>
           <input
             id="login-email"
             type="email"
@@ -35,7 +37,9 @@
 
         <div class="form-group">
           <div class="label-row">
-            <label for="login-password" class="form-label required">Mật khẩu:</label>
+            <label for="login-password" class="form-label required">
+              <i class="bi bi-lock"></i> Mật khẩu:
+            </label>
             <a href="#" class="forgot-link" data-testid="link-quen-mat-khau" @click.prevent="$emit('chuyen-tab', 'quen_mat_khau')">Quên mật khẩu?</a>
           </div>
           <input
@@ -60,22 +64,24 @@
           class="btn-submit"
           data-testid="btn-dang-nhap"
           @click="xuLyDangNhap"
+          :disabled="isLoading"
         >
-          Đăng Nhập Cổng Quản Trị
+          <span v-if="isLoading"><i class="bi bi-arrow-repeat spin"></i> Đang xử lý...</span>
+          <span v-else><i class="bi bi-box-arrow-in-right"></i> Đăng Nhập Cổng Quản Trị</span>
         </button>
       </form>
 
       <!-- Khung tài khoản kiểm thử mẫu (CLICK VÀO ĐỂ TỰ ĐỘNG ĐIỀN) -->
       <div class="test-accounts" data-testid="box-test-accounts">
-        <div class="test-header">🧪 Tài Khoản Mẫu (Click để chọn nhanh):</div>
+        <div class="test-header"><i class="bi bi-flask"></i> Tài Khoản Mẫu (Click để chọn nhanh):</div>
         <div class="account-pill clickable-pill" @click="chonTaiKhoan('admin@shop.com', 'password123')" title="Click để điền tài khoản này">
-          <span>Admin Flagship:</span> <code>admin@shop.com</code>
+          <span><i class="bi bi-shield-check text-primary"></i> Admin Flagship:</span> <code>admin@shop.com</code>
         </div>
         <div class="account-pill clickable-pill" @click="chonTaiKhoan('customer@shop.com', 'password123')" title="Click để điền tài khoản này">
-          <span>Khách hàng VIP:</span> <code>customer@shop.com</code>
+          <span><i class="bi bi-person-heart text-success"></i> Khách hàng VIP:</span> <code>customer@shop.com</code>
         </div>
         <div class="account-pill account-pill-danger clickable-pill" @click="chonTaiKhoan('blocked@shop.com', 'password123')" title="Click để test case tài khoản bị khóa">
-          <span>Tài khoản khóa:</span> <code>blocked@shop.com</code>
+          <span><i class="bi bi-slash-circle text-danger"></i> Tài khoản khóa:</span> <code>blocked@shop.com</code>
         </div>
       </div>
 
@@ -90,6 +96,7 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { toast } from '@/utils/toast'
 
 const emit = defineEmits(['chuyen-tab'])
 
@@ -105,6 +112,7 @@ function chonTaiKhoan(mail, pass) {
   password.value = pass
   thongBaoLoi.value = ''
   thongBaoThanhCong.value = ''
+  toast.info('Đã điền tài khoản: ' + mail, 'Điền Nhanh')
 }
 
 function xuLyDangNhap() {
@@ -119,7 +127,10 @@ function xuLyDangNhap() {
     })
     .then(res => {
       if (res.data.status === true || res.data.status == 1) {
-        thongBaoThanhCong.value = res.data.message || 'Đăng nhập thành công!'
+        const msg = res.data.message || 'Đăng nhập thành công!'
+        thongBaoThanhCong.value = msg
+        toast.success(msg, 'Đăng Nhập Thành Công')
+        
         if (res.data.token) {
           localStorage.setItem('auth_token', res.data.token)
         }
@@ -128,15 +139,18 @@ function xuLyDangNhap() {
         }
         setTimeout(() => {
           emit('chuyen-tab', 'tong_quan')
-        }, 700)
+        }, 600)
       } else {
-        thongBaoLoi.value = res.data.message || 'Đăng nhập không thành công!'
+        const msg = res.data.message || 'Đăng nhập không thành công!'
+        thongBaoLoi.value = msg
+        toast.error(msg, 'Đăng Nhập Thất Bại')
       }
     })
     .catch(err => {
       console.error('Lỗi đăng nhập:', err)
       const msg = err.response?.data?.message || 'Có lỗi xảy ra khi kết nối máy chủ!'
       thongBaoLoi.value = msg
+      toast.error(msg, 'Đăng Nhập Thất Bại')
     })
     .finally(() => {
       isLoading.value = false

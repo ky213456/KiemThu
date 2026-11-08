@@ -20,11 +20,11 @@
         </div>
 
         <button type="button" class="btn-report" @click="xuatBaoCao">
-          <span class="icon">📄</span> Xuất báo cáo
+          <i class="bi bi-file-earmark-arrow-down-fill"></i> Xuất báo cáo
         </button>
 
         <button type="button" class="btn-new-order" data-testid="btn-tao-don-moi" @click="$emit('chuyen-tab', 'quan_ly_don_hang')">
-          <span class="icon">+</span> Tạo đơn hàng mới <span class="shortcut">F2</span>
+          <i class="bi bi-plus-circle-fill"></i> Tạo đơn hàng mới <span class="shortcut">F2</span>
         </button>
       </div>
     </div>
@@ -457,7 +457,7 @@
             </div>
             <div class="feed-actions">
               <span class="feed-badge-ship">AhaMove lấy hàng</span>
-              <button type="button" class="btn-feed-action" @click="inBill('#ORD-5819')">📦 Phiếu giao</button>
+              <button type="button" class="btn-feed-action" @click="inBill('#ORD-5819')"><i class="bi bi-box-seam"></i> Phiếu giao</button>
             </div>
           </div>
 
@@ -479,7 +479,7 @@
             </div>
             <div class="feed-actions">
               <span class="feed-badge-quầy">Tại quầy Flagship</span>
-              <button type="button" class="btn-feed-action" @click="inBill('#ORD-5818')">🖨️ In bill</button>
+              <button type="button" class="btn-feed-action" @click="inBill('#ORD-5818')"><i class="bi bi-printer"></i> In bill</button>
             </div>
           </div>
         </div>
@@ -493,6 +493,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { toast } from '@/utils/toast'
 
 const emit = defineEmits(['chuyen-tab'])
 
@@ -537,15 +538,15 @@ function chonThoiGian(moc) {
 }
 
 function xuatBaoCao() {
-  alert('Đang kết xuất báo cáo doanh số ' + thoiGianLabel.value + ' ra file Excel & PDF thành công!')
+  toast.success('Đang kết xuất báo cáo doanh số ' + thoiGianLabel.value + ' ra file Excel & PDF thành công!', 'Xuất Báo Cáo')
 }
 
 function xemChiTietDoanhThu() {
-  alert('Chi tiết doanh thu ' + thoiGianLabel.value + ': Đạt ' + kpiData.value.doanhThu + 'đ (Tăng trưởng 14.2% so với kỳ trước).')
+  toast.info('Chi tiết doanh thu ' + thoiGianLabel.value + ': Đạt ' + kpiData.value.doanhThu + 'đ (Tăng trưởng 14.2% so với kỳ trước).', 'Chi Tiết Doanh Thu')
 }
 
 function inBill(maDon) {
-  alert('Lệnh in hóa đơn ' + maDon + ' đã được gửi tới máy in nhiệt POS Flagship Q1!')
+  toast.success('Lệnh in hóa đơn ' + maDon + ' đã được gửi tới máy in nhiệt POS Flagship Q1!', 'In Hóa Đơn')
 }
 </script>
 

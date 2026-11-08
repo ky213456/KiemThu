@@ -10,10 +10,10 @@
 
       <div class="page-actions">
         <button type="button" class="btn-secondary-atelier" @click="loadData">
-          <span>🔄</span> Tải Lại Dữ Liệu
+          <i class="bi bi-arrow-clockwise"></i> Tải Lại Dữ Liệu
         </button>
         <button type="button" class="btn-primary-atelier" data-testid="btn-them-user" @click="moModalThem">
-          <span>+</span> Thêm Tài Khoản Mới <span class="shortcut">F2</span>
+          <i class="bi bi-person-plus-fill"></i> Thêm Tài Khoản Mới <span class="shortcut">F2</span>
         </button>
       </div>
     </div>
@@ -21,7 +21,7 @@
     <!-- BỘ LỌC TĨNH SANG TRỌNG -->
     <div class="filter-bar">
       <div class="search-field">
-        <span class="icon">🔍</span>
+        <span class="icon"><i class="bi bi-search"></i></span>
         <input
           id="tim-kiem-user"
           type="text"
@@ -40,7 +40,7 @@
           <option value="khach_hang">Khách Hàng (VIP &amp; Regular)</option>
         </select>
 
-        <button type="button" class="btn-reset" @click="tim_kiem = ''; loc_vai_tro = ''">Đặt lại</button>
+        <button type="button" class="btn-reset" @click="tim_kiem = ''; loc_vai_tro = ''"><i class="bi bi-arrow-counterclockwise"></i> Đặt lại</button>
       </div>
     </div>
 
@@ -96,8 +96,8 @@
               </button>
             </td>
             <td class="text-center">
-              <button type="button" class="btn-action edit" :data-testid="'btn-sua-user-' + (index + 1)" @click="moModalSua(item)">Sửa</button>
-              <button type="button" class="btn-action lock" :data-testid="'btn-khoa-user-' + (index + 1)" @click="moModalXoa(item)">Xóa</button>
+              <button type="button" class="btn-action edit" :data-testid="'btn-sua-user-' + (index + 1)" @click="moModalSua(item)"><i class="bi bi-pencil-square"></i> Sửa</button>
+              <button type="button" class="btn-action lock" :data-testid="'btn-khoa-user-' + (index + 1)" @click="moModalXoa(item)"><i class="bi bi-trash3-fill"></i> Xóa</button>
             </td>
           </tr>
           <tr v-if="list_user_filter.length === 0">

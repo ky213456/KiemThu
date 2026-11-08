@@ -14,15 +14,17 @@
 
       <!-- Thông báo lỗi hoặc thành công -->
       <div v-if="thongBaoLoi" class="alert-box alert-error">
-        <span>⚠️ {{ thongBaoLoi }}</span>
+        <span><i class="bi bi-exclamation-circle-fill"></i> {{ thongBaoLoi }}</span>
       </div>
       <div v-if="thongBaoThanhCong" class="alert-box alert-success">
-        <span>✅ {{ thongBaoThanhCong }}</span>
+        <span><i class="bi bi-check-circle-fill"></i> {{ thongBaoThanhCong }}</span>
       </div>
 
       <form data-testid="form-dang-ky" @submit.prevent="xuLyDangKy">
         <div class="form-group">
-          <label for="reg-hoten" class="form-label required">Họ và tên Quý khách:</label>
+          <label for="reg-hoten" class="form-label required">
+            <i class="bi bi-person"></i> Họ và tên Quý khách:
+          </label>
           <input
             id="reg-hoten"
             type="text"
@@ -34,7 +36,9 @@
         </div>
 
         <div class="form-group">
-          <label for="reg-email" class="form-label required">Địa chỉ Email:</label>
+          <label for="reg-email" class="form-label required">
+            <i class="bi bi-envelope-at"></i> Địa chỉ Email:
+          </label>
           <input
             id="reg-email"
             type="email"
@@ -46,7 +50,9 @@
         </div>
 
         <div class="form-group">
-          <label for="reg-phone" class="form-label required">Số điện thoại liên lạc:</label>
+          <label for="reg-phone" class="form-label required">
+            <i class="bi bi-telephone"></i> Số điện thoại liên lạc:
+          </label>
           <input
             id="reg-phone"
             type="tel"
@@ -58,7 +64,9 @@
         </div>
 
         <div class="form-group">
-          <label for="reg-password" class="form-label required">Mật khẩu bảo mật:</label>
+          <label for="reg-password" class="form-label required">
+            <i class="bi bi-lock"></i> Mật khẩu bảo mật:
+          </label>
           <input
             id="reg-password"
             type="password"
@@ -70,7 +78,9 @@
         </div>
 
         <div class="form-group">
-          <label for="reg-confirm-password" class="form-label required">Xác nhận mật khẩu:</label>
+          <label for="reg-confirm-password" class="form-label required">
+            <i class="bi bi-shield-check"></i> Xác nhận mật khẩu:
+          </label>
           <input
             id="reg-confirm-password"
             type="password"
@@ -93,8 +103,10 @@
           class="btn-submit"
           data-testid="btn-dang-ky"
           @click="xuLyDangKy"
+          :disabled="isLoading"
         >
-          Hoàn Tất Đăng Ký Tài Khoản
+          <span v-if="isLoading"><i class="bi bi-arrow-repeat spin"></i> Đang đăng ký...</span>
+          <span v-else><i class="bi bi-person-plus-fill"></i> Hoàn Tất Đăng Ký Tài Khoản</span>
         </button>
       </form>
 
@@ -109,6 +121,7 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { toast } from '@/utils/toast'
 
 const emit = defineEmits(['chuyen-tab'])
 
@@ -139,18 +152,23 @@ function xuLyDangKy() {
     })
     .then(res => {
       if (res.data.status === true || res.data.status == 1) {
-        thongBaoThanhCong.value = res.data.message || 'Chúc mừng Quý khách! Đăng ký tài khoản VIP thành công.'
+        const msg = res.data.message || 'Chúc mừng Quý khách! Đăng ký tài khoản VIP thành công.'
+        thongBaoThanhCong.value = msg
+        toast.success(msg, 'Đăng Ký Thành Công')
         setTimeout(() => {
           emit('chuyen-tab', 'dang_nhap')
-        }, 1200)
+        }, 1000)
       } else {
-        thongBaoLoi.value = res.data.message || 'Đăng ký không thành công!'
+        const msg = res.data.message || 'Đăng ký không thành công!'
+        thongBaoLoi.value = msg
+        toast.error(msg, 'Đăng Ký Thất Bại')
       }
     })
     .catch(err => {
       console.error('Lỗi đăng ký:', err)
       const msg = err.response?.data?.message || 'Có lỗi xảy ra khi đăng ký tài khoản!'
       thongBaoLoi.value = msg
+      toast.error(msg, 'Đăng Ký Thất Bại')
     })
     .finally(() => {
       isLoading.value = false
