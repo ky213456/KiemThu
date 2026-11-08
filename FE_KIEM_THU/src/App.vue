@@ -156,6 +156,20 @@
           </a>
         </nav>
 
+        <!-- NÚT ĐĂNG XUẤT SIDEBAR -->
+        <div class="sidebar-logout-box">
+          <button
+            type="button"
+            class="btn-sidebar-logout"
+            data-testid="btn-sidebar-logout"
+            @click="dangXuat"
+            title="Đăng xuất khỏi hệ thống Maison Atelier"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Đăng Xuất</span>
+          </button>
+        </div>
+
         <!-- CA LÀM VIỆC HIỆN TẠI DƯỚI CÙNG -->
         <div class="shift-footer" @click="moModalBanGiaoCa" style="cursor: pointer;" title="Click để xem chi tiết hoặc bàn giao ca">
           <div class="shift-status">
@@ -246,6 +260,18 @@
                 </div>
               </div>
             </div>
+
+            <!-- NÚT ĐĂNG XUẤT TOPBAR -->
+            <button
+              type="button"
+              class="btn-topbar-logout"
+              data-testid="btn-topbar-logout"
+              @click="dangXuat"
+              title="Đăng xuất khỏi hệ thống Maison Atelier"
+            >
+              <i class="bi bi-box-arrow-right"></i>
+              <span class="logout-text">Đăng Xuất</span>
+            </button>
 
             <!-- Profile Người Dùng -->
             <div class="user-profile-widget" @click="hienMenuProfile = !hienMenuProfile">
@@ -343,7 +369,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 // Import Toast component & helper
 import ToastContainer from './components/common/ToastContainer.vue'
@@ -363,10 +389,71 @@ import DangNhap from './components/auth/DangNhap/index.vue'
 import DangKy from './components/auth/DangKy/index.vue'
 import QuenMatKhau from './components/auth/QuenMatKhau/index.vue'
 
+// Danh sách các tab hợp lệ của hệ thống
+const validAdminTabs = [
+  'tong_quan',
+  'quan_ly_san_pham',
+  'quan_ly_danh_muc',
+  'quan_ly_don_hang',
+  'quan_ly_nguoi_dung',
+  'quan_ly_ma_giam_gia',
+  'quan_ly_danh_gia'
+]
+const validAuthTabs = ['dang_nhap', 'dang_ky', 'quen_mat_khau']
+const allTabs = [...validAdminTabs, ...validAuthTabs]
+
+// Hàm xác định tab ban đầu:
+// - Khi CHƯA đăng nhập: Bắt buộc vào dang_nhap (hoặc dang_ky / quen_mat_khau)
+// - Khi ĐÃ đăng nhập: Giữ nguyên tab từ URL hash (#quan_ly_san_pham, #quan_ly_nguoi_dung,...) hoặc localStorage
+function layTabKhoiTao() {
+  const token = localStorage.getItem('auth_token')
+  const hash = window.location.hash ? window.location.hash.replace(/^#\/?/, '').trim() : ''
+  const savedTab = localStorage.getItem('active_tab')
+
+  // Chưa đăng nhập -> bắt buộc vào trang auth
+  if (!token) {
+    if (['dang_ky', 'quen_mat_khau'].includes(hash)) {
+      return hash
+    }
+    return 'dang_nhap'
+  }
+
+  // Đã đăng nhập:
+  // 1. Khớp theo URL hash
+  if (hash && allTabs.includes(hash)) {
+    if (hash === 'dang_nhap') {
+      return savedTab && validAdminTabs.includes(savedTab) ? savedTab : 'tong_quan'
+    }
+    return hash
+  }
+
+  // 2. Khớp theo tab trước khi reload (F5)
+  if (savedTab && validAdminTabs.includes(savedTab)) {
+    return savedTab
+  }
+
+  // 3. Mặc định là Tổng quan Dashboard
+  return 'tong_quan'
+}
+
 // Quản lý xác thực và tab hiện tại
-// Khởi tạo mặc định luôn vào Đăng Nhập trước để thực hiện đăng nhập
 const daDangNhap = ref(!!localStorage.getItem('auth_token'))
-const tabHienTai = ref('dang_nhap')
+const tabHienTai = ref(layTabKhoiTao())
+
+onMounted(() => {
+  // Đồng bộ hash URL nếu chưa có
+  if (!window.location.hash || window.location.hash === '#') {
+    window.location.hash = '#' + tabHienTai.value
+  }
+
+  // Lắng nghe thay đổi hash khi người dùng ấn Back / Forward trên trình duyệt
+  window.addEventListener('hashchange', () => {
+    const newHash = window.location.hash ? window.location.hash.replace(/^#\/?/, '').trim() : ''
+    if (newHash && newHash !== tabHienTai.value && allTabs.includes(newHash)) {
+      chuyenTab(newHash)
+    }
+  })
+})
 const tuKhoaTimKiem = ref('')
 
 // Thông tin người dùng đăng nhập
@@ -422,9 +509,11 @@ function dangXuat() {
   hienMenuProfile.value = false
   localStorage.removeItem('auth_token')
   localStorage.removeItem('auth_user')
+  localStorage.removeItem('active_tab')
   daDangNhap.value = false
-  toast.info('Đã đăng xuất khỏi hệ thống thành công!', 'Đăng Xuất')
   tabHienTai.value = 'dang_nhap'
+  window.location.hash = '#dang_nhap'
+  toast.success('Đã đăng xuất khỏi hệ thống thành công!', 'Đăng Xuất')
 }
 
 function timKiemTopbar() {
@@ -433,22 +522,27 @@ function timKiemTopbar() {
 }
 
 const laTrangAuth = computed(() => {
-  return ['dang_nhap', 'dang_ky', 'quen_mat_khau'].includes(tabHienTai.value)
+  return validAuthTabs.includes(tabHienTai.value)
 })
 
 function chuyenTab(tab) {
   const token = localStorage.getItem('auth_token')
   daDangNhap.value = !!token
-  const isAuthTab = ['dang_nhap', 'dang_ky', 'quen_mat_khau'].includes(tab)
+  const isAuthTab = validAuthTabs.includes(tab)
 
-  // Nếu truy cập vào trang quản trị mà chưa đăng nhập thì chặn lại
+  // Nếu truy cập vào trang quản trị mà chưa đăng nhập thì chặn lại và điều hướng về Đăng nhập
   if (!isAuthTab && !token) {
     toast.warning('Vui lòng đăng nhập tài khoản trước khi truy cập hệ thống quản trị!', 'Yêu Cầu Đăng Nhập')
     tabHienTai.value = 'dang_nhap'
+    window.location.hash = '#dang_nhap'
+    localStorage.setItem('active_tab', 'dang_nhap')
     return
   }
 
+  // Chuyển tab thành công và lưu lại trạng thái vào URL Hash + localStorage để khi F5 không bị mất
   tabHienTai.value = tab
+  window.location.hash = '#' + tab
+  localStorage.setItem('active_tab', tab)
 }
 </script>
 
@@ -677,6 +771,56 @@ function chuyenTab(tab) {
   display: flex;
   flex-direction: column;
   min-width: 0;
+}
+
+/* Nút Đăng Xuất Topbar */
+.btn-topbar-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-topbar-logout:hover {
+  background: #ffe4e6;
+  border-color: #fda4af;
+  color: #be123c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(225, 29, 72, 0.15);
+}
+
+/* Nút Đăng Xuất Sidebar */
+.sidebar-logout-box {
+  padding: 10px 12px;
+  border-top: 1px solid #1e293b;
+}
+.btn-sidebar-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-sidebar-logout:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
 }
 
 /* Topbar */
