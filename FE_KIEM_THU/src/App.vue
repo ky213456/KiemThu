@@ -3,7 +3,7 @@
     
     <!-- 1. VIEW AUTH: ĐĂNG NHẬP / ĐĂNG KÝ (NẾU CHỌN TAB AUTH) -->
     <div v-if="laTrangAuth" class="auth-fullscreen">
-      <div class="auth-top-switch">
+      <div v-if="daDangNhap" class="auth-top-switch">
         <button class="btn-back-atelier" data-testid="btn-ve-admin" @click="chuyenTab('tong_quan')">
           ← Quay lại Maison Atelier Dashboard
         </button>
@@ -248,8 +248,8 @@
             <!-- Profile Người Dùng -->
             <div class="user-profile-widget" @click="hienMenuProfile = !hienMenuProfile">
               <div class="user-text">
-                <span class="user-name">Trần Mai Anh</span>
-                <span class="user-role">Quản lý Cửa Hàng</span>
+                <span class="user-name">{{ tenHienThi }}</span>
+                <span class="user-role">{{ vaiTroHienThi }}</span>
               </div>
               <img
                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
@@ -357,8 +357,31 @@ import DangNhap from './components/auth/DangNhap/index.vue'
 import DangKy from './components/auth/DangKy/index.vue'
 import QuenMatKhau from './components/auth/QuenMatKhau/index.vue'
 
-const tabHienTai = ref('tong_quan')
+// Quản lý xác thực và tab hiện tại
+// Khởi tạo mặc định luôn vào Đăng Nhập trước để thực hiện đăng nhập
+const daDangNhap = ref(!!localStorage.getItem('auth_token'))
+const tabHienTai = ref('dang_nhap')
 const tuKhoaTimKiem = ref('')
+
+// Thông tin người dùng đăng nhập
+const thongTinNguoiDung = computed(() => {
+  try {
+    const raw = localStorage.getItem('auth_user')
+    return raw ? JSON.parse(raw) : null
+  } catch (e) {
+    return null
+  }
+})
+
+const tenHienThi = computed(() => {
+  return thongTinNguoiDung.value?.ho_ten || 'Trần Mai Anh'
+})
+
+const vaiTroHienThi = computed(() => {
+  if (thongTinNguoiDung.value?.vai_tro === 'admin') return 'Quản trị viên (Admin)'
+  if (thongTinNguoiDung.value?.vai_tro) return 'Thành viên (' + thongTinNguoiDung.value.vai_tro + ')'
+  return 'Quản lý Cửa Hàng'
+})
 
 // Dropdowns & Modals state
 const hienModalChiNhanh = ref(false)
@@ -391,8 +414,11 @@ function xacNhanBanGiaoCa() {
 
 function dangXuat() {
   hienMenuProfile.value = false
-  alert('Đăng xuất thành công!')
-  chuyenTab('dang_nhap')
+  localStorage.removeItem('auth_token')
+  localStorage.removeItem('auth_user')
+  daDangNhap.value = false
+  alert('Đã đăng xuất khỏi hệ thống thành công!')
+  tabHienTai.value = 'dang_nhap'
 }
 
 function timKiemTopbar() {
@@ -405,6 +431,17 @@ const laTrangAuth = computed(() => {
 })
 
 function chuyenTab(tab) {
+  const token = localStorage.getItem('auth_token')
+  daDangNhap.value = !!token
+  const isAuthTab = ['dang_nhap', 'dang_ky', 'quen_mat_khau'].includes(tab)
+
+  // Nếu truy cập vào trang quản trị mà chưa đăng nhập thì chặn lại
+  if (!isAuthTab && !token) {
+    alert('Vui lòng đăng nhập tài khoản trước khi truy cập hệ thống quản trị!')
+    tabHienTai.value = 'dang_nhap'
+    return
+  }
+
   tabHienTai.value = tab
 }
 </script>
